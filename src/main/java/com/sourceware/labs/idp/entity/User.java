@@ -9,14 +9,22 @@ import com.google.gson.Gson;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
+/**
+ * Spring Boot Entity class for a User in the IDP server.
+ * 
+ * @author Robert Forristall
+ */
 @Entity
 public class User {
 
 	// Internal database ID for the user
-	private @Id @GeneratedValue Long id;
+	private @Id @GeneratedValue @NotNull Long id;
 
 	// Email that the user will use to signup/login
+	@Size(min=1, max=50)
 	private String email;
 
 	// Password for the user
