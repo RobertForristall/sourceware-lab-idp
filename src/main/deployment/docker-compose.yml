@@ -9,7 +9,7 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
+      - DB_PASS=${IDP_USER_PASSWORD}
     depends_on:
       mysql:
         condition: service_healthy
@@ -20,8 +20,7 @@ services:
       - mysql-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports: 
-      - 3306:3306
+      IDP_USER_PASSWORD: ${IDP_USER_PASSWORD}
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 1m30s

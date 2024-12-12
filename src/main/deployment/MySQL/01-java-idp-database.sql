@@ -1,2 +1,7 @@
-create database JavaIdp;
-use JavaIdp;
+CREATE USER 'idpuser'@'%' IDENTIFIED BY '__IDP_USER_PASSWORD__';
+
+CREATE DATABASE JavaIdp;
+
+GRANT CREATE, INSERT, UPDATE, DELETE, SELECT, REFERENCES on JavaIdp.* to 'idpuser'@'%';
+
+USE JavaIdp;
