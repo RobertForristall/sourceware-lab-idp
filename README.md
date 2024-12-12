@@ -41,10 +41,3 @@ and Maven dependencies.
 
 The Swagger API UI can be accessed at `http://localhost:8080/swagger-ui/index.html`.
 
-## TODOs
-
-- Allow for control over hostname and port of server
-- Allow for control over the selected database user
-- Add styling sheet
-- Add github actions
-
