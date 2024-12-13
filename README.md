@@ -8,6 +8,7 @@ If running in development mode place a `.env` file in deployment if using docker
 in Eclipse run configuration if using Eclipse.
 
 ```
+# Database related properties
 DB_HOST: Hostname of the MySQL database that the IDP server is connecting to
 DB_PORT: Port of the MySQL database that the IDP server is connecting to
 DB_USER: Username of the MySQL user in the MySQL database that the IDP server is connecting to
@@ -15,6 +16,12 @@ DB_PASS: (Only for eclipse) Password of the MySQL user in the MySQL database tha
 DB_DATABASE: Name of the MySQL database that the IDP server is connecting to
 MYSQL_ROOT_PASSWORD: (Only for docker) Password of the root user in the MySQL database
 IDP_USER_PASSWORD: (Only for docker) Password of the idpuser user in the MySQL database
+
+# AWS SES related properties
+AWS_REGION: The region in AWS that the email service will use
+AWS_ACCESS_KEY: Access key of the AWS IAM user that has permissions to send emails
+AWS_SECRET_KEY: Secret key of the AWS IAM user that has permissions to send emails
+AWS_FROM_EMAIL: The email address that emails will be sent from
 ```
 
 ## To Run In Eclipse
