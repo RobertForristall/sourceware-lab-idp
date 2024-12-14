@@ -3,6 +3,7 @@ package com.sourceware.labs.idp.entity;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Set;
 
 import com.google.gson.Gson;
 
@@ -11,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -72,6 +74,9 @@ public class User {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "accountVerification", referencedColumnName = "id")
 	private AccountVerification accountVerification;
+	
+	@OneToMany(mappedBy = "user")
+	private Set<RecoveryVerification> recoveryVerifications;
 
 	public User() {
 		super();
