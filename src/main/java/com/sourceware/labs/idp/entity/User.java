@@ -12,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -77,6 +78,9 @@ public class User {
 	
 	@OneToMany(mappedBy = "user")
 	private Set<RecoveryVerification> recoveryVerifications;
+	
+	@ManyToMany
+	private Set<Role> roles;
 
 	public User() {
 		super();
