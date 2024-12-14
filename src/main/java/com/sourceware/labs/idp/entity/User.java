@@ -84,6 +84,9 @@ public class User {
 	
 	@ManyToMany
 	private Set<AdditionalPermission> additionalPermissions;
+	
+	@OneToMany(mappedBy = "user")
+	private Set<AuditLog> auditLogs;
 
 	public User() {
 		super();
