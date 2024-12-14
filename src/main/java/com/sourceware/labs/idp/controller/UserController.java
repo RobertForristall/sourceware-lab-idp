@@ -26,6 +26,25 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Spring rest controller for managing user authentication information
+ * <br />
+ * Routes:
+ * <ul>
+ * <li>- POST /user/signup: Handle signing up a new user with the IDP server</li>
+ * <li>- POST /user/login: Method: Handle logging in a user with the IDP server</li>
+ * <li>- POST /user/verify: Method: Handle verifying a new user's account</li>
+ * <li>- GET /user/recover/questions: Return the user's security questions</li>
+ * <li>- POST /user/recover/questions: Verify that the user's security question answers are correct</li>
+ * <li>- GET /user/recover/email: Send an email to the user's email or recoveryEmail that can allow them to recover their account</li>
+ * <li>- POST /user/recover/email: Verify that the user's verification token obtained from email is valid</li>
+ * <li>- GET /user/recover/phone: Send a verification code to the user's phone that can be used to recover their account</li>
+ * <li>- POST /user/recover/email: Verify that the user's verification code obtained from phone is valid</li>
+ * <li>- PUT /user/update: Updates the user's information</li>
+ * </ul>
+ * TODO finish working on the outlined routes
+ * @author Robert Forristall (robert.s.forristall@gmail.com)
+ */
 @RestController
 public class UserController {
 	

@@ -14,8 +14,18 @@ import org.springframework.http.ResponseEntity;
 import com.sourceware.labs.idp.BaseIdpApplicationTests;
 import com.sourceware.labs.idp.entity.User;
 
+/**
+ * Testing class for the Users route of the IDP server
+ *
+ * @author Robert Forristall (robert.s.forristall@gmail.com)
+ */
 public class UserTests extends BaseIdpApplicationTests{
 
+	/**
+	 * Testing the POST /user route for creating a new user
+	 * @throws Exception
+	 * TODO remove this test when the user route is reconfigured to use a proper signup method
+	 */
 	@Test
 	void postUser() throws Exception {
 		URI uri = new URI(baseUrl + "user");

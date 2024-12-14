@@ -10,9 +10,18 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 
+/**
+ * Spring configuration file for defining the server properties displayed in the OpenAPI (Swagger) UI
+ *
+ * @author Robert Forristall (robert.s.forristall@gmail.com)
+ */
 @Configuration
 public class OpenAPIConfiguration {
 
+	/**
+	 * Bean function for defining the server properties for OpenAPI to reference
+	 * @return {@link OpenAPI}
+	 */
    @Bean
    public OpenAPI defineOpenApi() {
        Server server = new Server();
