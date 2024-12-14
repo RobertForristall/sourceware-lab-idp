@@ -81,6 +81,9 @@ public class User {
 	
 	@ManyToMany
 	private Set<Role> roles;
+	
+	@ManyToMany
+	private Set<AdditionalPermission> additionalPermissions;
 
 	public User() {
 		super();
