@@ -60,6 +60,10 @@ public class User {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "recoveryEmail", referencedColumnName = "id")
 	private RecoveryEmail recoveryEmail;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "recoveryPhone", referencedColumnName = "id")
+	private RecoveryPhone recoveryPhone;
 
 	public User() {
 		super();
