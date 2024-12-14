@@ -27,4 +27,5 @@ public class AwsEmailService {
 		simpleMailMessage.setText(body);
 		return simpleMailMessage;
 	}
+	
 }
