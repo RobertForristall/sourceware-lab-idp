@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sourceware.labs.idp.entity.User;
-import com.sourceware.labs.idp.repo.UserRepository;
+import com.sourceware.labs.idp.repo.UserRepo;
 import com.sourceware.labs.idp.service.AwsEmailService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,12 +50,12 @@ public class UserController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
-	private final UserRepository repo;
+	private final UserRepo repo;
 	
 	@Autowired
 	private AwsEmailService awsEmailService;
 	
-	UserController(UserRepository repo) {
+	UserController(UserRepo repo) {
 		this.repo = repo;
 	}
 	
