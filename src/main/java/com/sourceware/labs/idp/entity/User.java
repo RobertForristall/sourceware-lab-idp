@@ -68,6 +68,10 @@ public class User {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "recoveryCode", referencedColumnName = "id")
 	private RecoveryCode recoveryCode;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "accountVerification", referencedColumnName = "id")
+	private AccountVerification accountVerification;
 
 	public User() {
 		super();
