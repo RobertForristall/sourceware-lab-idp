@@ -1,5 +1,7 @@
 package com.sourceware.labs.idp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AwsEmailService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AwsEmailService.class);
 
 	// Inject the mail sender configured to use AWS
 	@Autowired
@@ -27,6 +31,7 @@ public class AwsEmailService {
 	 * @param simpleMailMessage - The message information to be sent
 	 */
 	public void sendMessage(SimpleMailMessage simpleMailMessage) {
+		LOGGER.info("Sending email to addresses: " + simpleMailMessage.getTo());
 		this.mailSender.send(simpleMailMessage);
 	}
 	
@@ -38,6 +43,7 @@ public class AwsEmailService {
 	 * @return {@link SimpleMailMessage} configured using the provided parameters
 	 */
 	public SimpleMailMessage createSimpleMailMessage(String toAddress, String subject, String body) {
+		LOGGER.debug("Creating simple mail message...");
 		SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
 		simpleMailMessage.setFrom(fromAddress);
 		simpleMailMessage.setTo(toAddress);
