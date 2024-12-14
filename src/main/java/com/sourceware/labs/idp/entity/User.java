@@ -6,9 +6,13 @@ import java.util.Objects;
 
 import com.google.gson.Gson;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -18,6 +22,7 @@ import jakarta.validation.constraints.Size;
  * @author Robert Forristall
  */
 @Entity
+@Table(name = "Users")
 public class User {
 
 	// Internal database ID for the user
@@ -47,6 +52,10 @@ public class User {
 
 	// Timestamp of when the user was last modified
 	private Timestamp modified;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "securityQuestionId", referencedColumnName = "id")
+	private SecurityQuestion securityQuestion;
 
 	public User() {
 		super();
