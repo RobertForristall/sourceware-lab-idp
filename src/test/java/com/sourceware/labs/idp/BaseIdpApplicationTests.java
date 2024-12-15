@@ -20,7 +20,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest(
 		  webEnvironment = WebEnvironment.DEFINED_PORT,
 		  properties = {
-		    "server.port=8090"
+		    "server.port=8090",
+		    "cloud.aws.email.from=from@test.com",
+		    "cloud.aws.region.static=us-east-1",
+		    "cloud.aws.region.auto=false",
+		    "cloud.aws.stack.auto=false",
+		    "cloud.aws.credentials.access-key=testAccessKey",
+		    "cloud.aws.credentials.secret-key=testSecretKey",
 		  })
 public abstract class BaseIdpApplicationTests {
 
