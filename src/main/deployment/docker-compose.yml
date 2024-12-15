@@ -14,6 +14,8 @@ services:
       - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
       - AWS_FROM_EMAIL=${AWS_FROM_EMAIL}
+      - KEYSTORE_PASS=${KEYSTORE_PASS}
+      - TOKEN_KEY_PASS=${TOKEN_KEY_PASS}
     depends_on:
       mysql:
         condition: service_healthy

@@ -27,6 +27,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 		    "cloud.aws.stack.auto=false",
 		    "cloud.aws.credentials.access-key=testAccessKey",
 		    "cloud.aws.credentials.secret-key=testSecretKey",
+		    "keystore.store.password=testPass",
+		    "keystore.key.token.password=testKeyPass"
 		  })
 public abstract class BaseIdpApplicationTests {
 

@@ -17,6 +17,8 @@ COPY --from=build /build ${HOME}
 
 WORKDIR ${HOME}
 
+RUN mkdir ${HOME}/ks
+
 RUN mv idp-0.0.1-SNAPSHOT.jar lib/idp-0.0.1-SNAPSHOT.jar
 
 RUN addgroup -S idp && adduser -S idp -G idp && chown -R idp:idp ${HOME}
