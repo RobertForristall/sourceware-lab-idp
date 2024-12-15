@@ -22,6 +22,10 @@ AWS_REGION: The region in AWS that the email service will use
 AWS_ACCESS_KEY: Access key of the AWS IAM user that has permissions to send emails
 AWS_SECRET_KEY: Secret key of the AWS IAM user that has permissions to send emails
 AWS_FROM_EMAIL: The email address that emails will be sent from
+
+# Keystore related properties
+KEYSTORE_PASS: Password for the keystore
+TOKEN_KEY_PASS: Password for the JWT token signing/validation key
 ```
 
 ## To Run In Eclipse
