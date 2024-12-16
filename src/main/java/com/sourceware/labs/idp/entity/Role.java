@@ -20,11 +20,40 @@ import jakarta.validation.constraints.NotNull;
 public class Role {
 	
 	public enum Application {
-		RealQuick
+		RealQuick ("RealQuick");
+		
+		private final String name;
+		
+		private Application(String s) {
+			name = s;
+		}
+		
+		public boolean equalsName(String otherName) {
+			return name.equals(otherName);
+		}
+		
+		public String toString() {
+			return name;
+		}
 	}
 	
 	public enum RoleName {
-		User, Admin
+		User ("User"), 
+		Admin ("Admin");
+		
+		private final String name;
+		
+		private RoleName(String s) {
+			name = s;
+		}
+		
+		public boolean equalsName(String otherName) {
+			return name.equals(otherName);
+		}
+		
+		public String toString() {
+			return name;
+		}
 	}
 
 	private @Id @GeneratedValue @NotNull Long id;

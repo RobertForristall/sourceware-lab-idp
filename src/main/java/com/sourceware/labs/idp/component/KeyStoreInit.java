@@ -39,9 +39,9 @@ public class KeyStoreInit {
 				tokenAlias,
 				tokenPassword,
 				"initial");
-		File keyStoreDir = new File("ks");
-		if (!keyStoreDir.exists()) {
-			keyStoreDir.mkdir();
+		File dir = new File(keyStoreDir);
+		if (!dir.exists()) {
+			dir.mkdir();
 		}
 		IdpKeyStoreAccessor.prepareKeyStoreAndSet(JWSAlgorithm.ES256, keyStoreData);
 	}
