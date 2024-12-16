@@ -178,6 +178,78 @@ public class User {
 		this.modified = modified;
 	}
 
+	public SecurityQuestion getSecurityQuestion() {
+		return securityQuestion;
+	}
+
+	public void setSecurityQuestion(SecurityQuestion securityQuestion) {
+		this.securityQuestion = securityQuestion;
+	}
+
+	public RecoveryEmail getRecoveryEmail() {
+		return recoveryEmail;
+	}
+
+	public void setRecoveryEmail(RecoveryEmail recoveryEmail) {
+		this.recoveryEmail = recoveryEmail;
+	}
+
+	public RecoveryPhone getRecoveryPhone() {
+		return recoveryPhone;
+	}
+
+	public void setRecoveryPhone(RecoveryPhone recoveryPhone) {
+		this.recoveryPhone = recoveryPhone;
+	}
+
+	public RecoveryCode getRecoveryCode() {
+		return recoveryCode;
+	}
+
+	public void setRecoveryCode(RecoveryCode recoveryCode) {
+		this.recoveryCode = recoveryCode;
+	}
+
+	public AccountVerification getAccountVerification() {
+		return accountVerification;
+	}
+
+	public void setAccountVerification(AccountVerification accountVerification) {
+		this.accountVerification = accountVerification;
+	}
+
+	public Set<RecoveryVerification> getRecoveryVerifications() {
+		return recoveryVerifications;
+	}
+
+	public void setRecoveryVerifications(Set<RecoveryVerification> recoveryVerifications) {
+		this.recoveryVerifications = recoveryVerifications;
+	}
+
+	public Set<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
+	}
+
+	public Set<AdditionalPermission> getAdditionalPermissions() {
+		return additionalPermissions;
+	}
+
+	public void setAdditionalPermissions(Set<AdditionalPermission> additionalPermissions) {
+		this.additionalPermissions = additionalPermissions;
+	}
+
+	public Set<AuditLog> getAuditLogs() {
+		return auditLogs;
+	}
+
+	public void setAuditLogs(Set<AuditLog> auditLogs) {
+		this.auditLogs = auditLogs;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(created, dob, email, firstName, id, lastName, modified, password, verified);
