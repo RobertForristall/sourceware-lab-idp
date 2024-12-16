@@ -114,7 +114,7 @@ public class IdpKeyStoreAccessor {
 			UnrecoverableEntryException, OperatorCreationException, JOSEException {
 		KeyStore ks = KeyStore.getInstance(KS_TYPE);
 
-		try (FileInputStream fis = new FileInputStream("ks/" + keyStoreData.getStoreFileName())) {
+		try (FileInputStream fis = new FileInputStream(keyStoreData.getStoreDir() + "/" + keyStoreData.getStoreFileName())) {
 			ks.load(fis, keyStoreData.getStorePassword().toCharArray());
 		} catch (FileNotFoundException ex) {
 			ks.load(null, keyStoreData.getStorePassword().toCharArray());
@@ -131,7 +131,7 @@ public class IdpKeyStoreAccessor {
 					: key.toECKey().toPublicKey();
 			PrivateKey privateKey = securityAlg.equals(JWSAlgorithm.RS384) ? key.toRSAKey().toPrivateKey()
 					: key.toECKey().toPrivateKey();
-			X500Name certName = new X500Name("CN=Robert F., O=Infotechsoft, C=US");
+			X500Name certName = new X500Name("CN=Robert F., O=Sourceware Lab, C=US");
 			SubjectPublicKeyInfo pubKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
 			final Date start = new Date();
 			final Date until = Date
@@ -147,11 +147,11 @@ public class IdpKeyStoreAccessor {
 			certChain[0] = certificate;
 			pkEntry = new KeyStore.PrivateKeyEntry(privateKey, certChain);
 			ks.setEntry(keyStoreData.getKeyAlias(), pkEntry, keyProtParam);
-			File keyStoreOutputDir = new File("_key_store");
+			File keyStoreOutputDir = new File(keyStoreData.getStoreDir());
 			if (!keyStoreOutputDir.exists()) {
 				keyStoreOutputDir.mkdir();
 			}
-			try (FileOutputStream fos = new FileOutputStream("ks/" + keyStoreData.getStoreFileName())) {
+			try (FileOutputStream fos = new FileOutputStream(keyStoreData.getStoreDir() + "/" + keyStoreData.getStoreFileName())) {
 				ks.store(fos, keyStoreData.getStorePassword().toCharArray());
 			}
 		}

@@ -14,6 +14,9 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class KeyStoreInit {
 	
+	@Value("${keystore.dir.name}")
+	private String keyStoreDir;
+	
 	@Value("${keystore.store.name}")
 	private String keyStoreName;
 	
@@ -30,6 +33,7 @@ public class KeyStoreInit {
 	@PostConstruct
 	private void createKeystoreAndKey() {
 		IdpKeyStoreData keyStoreData = new IdpKeyStoreData(
+				keyStoreDir,
 				keyStoreName,
 				keyStorePassword,
 				tokenAlias,
