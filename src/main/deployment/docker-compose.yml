@@ -6,6 +6,7 @@ services:
       - "8080:8080"
     environment:
       - DB_DATABASE=${DB_DATABASE}
+      - DB_SCHEMA=${DB_SCHEMA}
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
@@ -17,22 +18,37 @@ services:
       - KEYSTORE_PASS=${KEYSTORE_PASS}
       - TOKEN_KEY_PASS=${TOKEN_KEY_PASS}
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
-  mysql:
-    image: mysql:8.0
+  # mysql:
+  #   image: mysql:8.0
+  #   volumes: 
+  #     - ./MySQL/:/docker-entrypoint-initdb.d
+  #     - mysql-data:/var/lib/mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #     IDP_USER_PASSWORD: ${IDP_USER_PASSWORD}
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+  #     interval: 1m30s
+  #     timeout: 30s
+  #     retries: 5
+  #     start_period: 20s
+  postgres:
+    image: postgres:17
     volumes: 
-      - ./MySQL/:/docker-entrypoint-initdb.d
-      - mysql-data:/var/lib/mysql
+      - ./PostgreSQL/:/docker-entrypoint-initdb.d
+      - postgres-data:/var/lib/postgresql/data
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       IDP_USER_PASSWORD: ${IDP_USER_PASSWORD}
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "pg_isready"]
       interval: 1m30s
       timeout: 30s
       retries: 5
       start_period: 20s
+
 
 # TODO set up connection to dedicated docker network for overall project
 networks:
@@ -40,3 +56,4 @@ networks:
 
 volumes:
   mysql-data:
+  postgres-data:

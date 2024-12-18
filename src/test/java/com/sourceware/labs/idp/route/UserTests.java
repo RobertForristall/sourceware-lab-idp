@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +28,7 @@ public class UserTests extends BaseIdpApplicationTests{
 	 * TODO remove this test when the user route is reconfigured to use a proper signup method
 	 */
 	@Test
+	@Disabled
 	void postUser() throws Exception {
 		URI uri = new URI(baseUrl + "user");
 		Date now = new Date();

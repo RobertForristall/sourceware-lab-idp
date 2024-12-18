@@ -1,16 +1,32 @@
 services:
-  mysql:
-    image: mysql:8.0
+  # mysql:
+  #   image: mysql:8.0
+  #   volumes: 
+  #     - ./MySQL/:/docker-entrypoint-initdb.d
+  #     - mysql-data:/var/lib/mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #     IDP_USER_PASSWORD: ${IDP_USER_PASSWORD}
+  #   ports:
+  #     - "3306:3306"
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+  #     interval: 1m30s
+  #     timeout: 30s
+  #     retries: 5
+  #     start_period: 20s
+  postgres:
+    image: postgres:17
     volumes: 
-      - ./MySQL/:/docker-entrypoint-initdb.d
-      - mysql-data:/var/lib/mysql
+      - ./PostgreSQL/:/docker-entrypoint-initdb.d
+      - postgres-data:/var/lib/postgresql/data
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       IDP_USER_PASSWORD: ${IDP_USER_PASSWORD}
     ports:
-      - "3306:3306"
+      - "5432:5432"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "pg_isready"]
       interval: 1m30s
       timeout: 30s
       retries: 5
@@ -22,3 +38,4 @@ networks:
 
 volumes:
   mysql-data:
+  postgres-data:

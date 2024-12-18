@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -28,7 +28,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 		    "cloud.aws.credentials.access-key=testAccessKey",
 		    "cloud.aws.credentials.secret-key=testSecretKey",
 		    "keystore.store.password=testPass",
-		    "keystore.key.token.password=testKeyPass"
+		    "keystore.key.token.password=testKeyPass",
+		    "spring.datasource.hikari.schema=public"
 		  })
 public abstract class BaseIdpApplicationTests {
 
@@ -38,7 +39,7 @@ public abstract class BaseIdpApplicationTests {
 	 */
 	@Container
 	@ServiceConnection
-	protected static MySQLContainer<?> mysql = new MySQLContainer("mysql:8.0");
+	protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer("postgres:17");
 
 	/**
 	 * The port that the server is running on
