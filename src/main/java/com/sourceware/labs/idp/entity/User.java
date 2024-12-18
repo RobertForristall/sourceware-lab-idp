@@ -8,6 +8,7 @@ import java.util.Set;
 import com.google.gson.Gson;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -16,6 +17,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -33,27 +36,36 @@ public class User {
 
 	// Email that the user will use to signup/login
 	@Size(min=1, max=50)
+	@Column(unique = true)
+	@NotBlank(message = "User's email must be defined")
 	private String email;
 
 	// Password for the user
+	@NotBlank(message = "User's password must be defined")
 	private String password;
 
 	// If the user has verified their email address
+	@NotNull(message = "User must have a verified state")
 	private boolean verified;
 
 	// First name of the user
+	@NotBlank(message = "User's first name must be defined")
 	private String firstName;
 
 	// Last name of the user
+	@NotBlank(message = "User's last name must be defined")
 	private String lastName;
 
 	// Date of birth for the user
+	@NotNull(message = "User's date of birth must be defined")
 	private Date dob;
 
 	// Timestamp of when the user was created
+	@NotNull(message = "All users should have an accurate created time")
 	private Timestamp created;
 
 	// Timestamp of when the user was last modified
+	@NotNull(message = "All users should have an up-to-date modified time")
 	private Timestamp modified;
 	
 	@OneToOne(cascade = CascadeType.ALL)
@@ -79,7 +91,7 @@ public class User {
 	@OneToMany(mappedBy = "user")
 	private Set<RecoveryVerification> recoveryVerifications;
 	
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.ALL)
 	private Set<Role> roles;
 	
 	@ManyToMany
