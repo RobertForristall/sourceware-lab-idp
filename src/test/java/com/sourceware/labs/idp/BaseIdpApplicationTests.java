@@ -5,9 +5,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import com.sourceware.labs.idp.service.AwsEmailService;
 
 /**
  * Base testing class for all tests that need to use the Spring Boot server during the test
@@ -52,6 +55,9 @@ public abstract class BaseIdpApplicationTests {
 	 */
 	@Autowired
 	protected TestRestTemplate restTemplate;
+	
+	@MockitoBean
+	protected AwsEmailService awsEmailService;
 
 	/**
 	 * Base URL of the testing Spring server
