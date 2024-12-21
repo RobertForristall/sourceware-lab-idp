@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sourceware.labs.idp.entity.AccountVerification;
 import com.sourceware.labs.idp.entity.Role;
 import com.sourceware.labs.idp.entity.SecurityQuestion;
 import com.sourceware.labs.idp.entity.User;
 import com.sourceware.labs.idp.entity.Role.Application;
 import com.sourceware.labs.idp.entity.Role.RoleName;
+import com.sourceware.labs.idp.repo.AccountVerificationRepo;
 import com.sourceware.labs.idp.repo.RoleRepo;
 import com.sourceware.labs.idp.repo.UserRepo;
 import com.sourceware.labs.idp.service.AuthService;
@@ -70,14 +72,18 @@ public class UserController {
 	private final RoleRepo roleRepo;
 	
 	@Autowired
+	private final AccountVerificationRepo accountVerificationRepo;
+	
+	@Autowired
 	private final AwsEmailService awsEmailService;
 	
 	@Autowired
 	private final AuthService authService;
 	
-	UserController(UserRepo userRepo, RoleRepo roleRepo, AwsEmailService awsEmailService, AuthService authService) {
+	UserController(UserRepo userRepo, RoleRepo roleRepo, AccountVerificationRepo accountVerificationRepo, AwsEmailService awsEmailService, AuthService authService) {
 		this.userRepo = userRepo;
 		this.roleRepo = roleRepo;
+		this.accountVerificationRepo = accountVerificationRepo;
 		this.awsEmailService = awsEmailService;
 		this.authService = authService;
 	}
@@ -98,6 +104,7 @@ public class UserController {
 			User user = userRepo.save(createNewUser(signupData));
 			String verificationToken = "testToken";
 			awsEmailService.sendMessage(awsEmailService.createSimpleMailMessage(user.getEmail(), "Sourceware Labs IDP User Verification", awsEmailService.createVerificatioEmailBody(user.getId(), verificationToken)));
+			accountVerificationRepo.save(new AccountVerification(user.getId(), verificationToken, user));
 			response.setStatus(HttpStatus.SC_CREATED);
 			return "User Created Successfully";
 		}
