@@ -84,7 +84,7 @@ public class UserController {
 	
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "User successfully signed up", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
-		@ApiResponse(responseCode = "400", description = "User failed to be signed up", content = @Content)
+		@ApiResponse(responseCode = "400", description = "User failed to be signed up", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))})
 	})
 	@Operation(summary = "Signup", description = "Signup a new user with the IDP service")
 	@Tag(name = "post", description = "POST methods for User APIs")
