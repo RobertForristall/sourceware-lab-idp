@@ -6,10 +6,11 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import com.sourceware.labs.idp.repo.UserRepo;
 import com.sourceware.labs.idp.service.AuthService;
 import com.sourceware.labs.idp.service.AwsEmailService;
 import com.sourceware.labs.idp.util.RestError;
+import com.sourceware.labs.idp.util.RestError.RestErrorBuilder;
 import com.sourceware.labs.idp.util.SignupData;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -97,13 +99,25 @@ public class UserController {
 	String signup(@RequestBody SignupData signupData, HttpServletResponse response) throws IOException {
 		Optional<RestError> error = signupData.isDataValid(getRoutePath(SIGNUP_PATH), RequestMethod.POST);
 		if (error.isPresent()) {
-			response.sendError(HttpStatus.SC_BAD_REQUEST, error.get().toString());
+			response.sendError(HttpStatus.BAD_REQUEST.value(), error.get().toString());
 		} else {
 			String verificationToken = "testToken";
-			User user = userRepo.save(createNewUser(signupData, verificationToken));
-			awsEmailService.sendMessage(awsEmailService.createSimpleMailMessage(user.getEmail(), "Sourceware Labs IDP User Verification", awsEmailService.createVerificatioEmailBody(user.getId(), verificationToken)));
-			response.setStatus(HttpStatus.SC_CREATED);
-			return "User Created Successfully";
+			try {
+				User user = userRepo.save(createNewUser(signupData, verificationToken));
+				awsEmailService.sendMessage(awsEmailService.createSimpleMailMessage(user.getEmail(), "Sourceware Labs IDP User Verification", awsEmailService.createVerificatioEmailBody(user.getId(), verificationToken)));
+				response.setStatus(HttpStatus.CREATED.value());
+				return "User Created Successfully";
+			} catch (Exception ex) {
+				if (ex.getClass().equals(DataIntegrityViolationException.class)) {
+					// TODO find a better way to catch this SQL error than parsing the message
+					if (ex.getLocalizedMessage().contains("Detail: Key (email)=("+signupData.getEmail()+") already exists")) {
+						response.sendError(HttpStatus.CONFLICT.value(), new RestErrorBuilder().setRoute(getRoutePath(SIGNUP_PATH)).setMethod(RequestMethod.POST).setErrorCode(5).setMsg("Error: A user with the provided email already exists").build().toString());
+					}
+					
+				} else {
+					throw ex;
+				}
+			}
 		}
 		return null;
 	}
