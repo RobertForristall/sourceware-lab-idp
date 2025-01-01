@@ -17,11 +17,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sourceware.labs.idp.entity.AccountVerification;
-import com.sourceware.labs.idp.entity.Role;
-import com.sourceware.labs.idp.entity.SecurityQuestion;
-import com.sourceware.labs.idp.entity.User;
 import com.sourceware.labs.idp.entity.Role.Application;
 import com.sourceware.labs.idp.entity.Role.RoleName;
+import com.sourceware.labs.idp.entity.SecurityQuestion;
+import com.sourceware.labs.idp.entity.User;
 import com.sourceware.labs.idp.repo.AccountVerificationRepo;
 import com.sourceware.labs.idp.repo.RoleRepo;
 import com.sourceware.labs.idp.repo.UserRepo;
@@ -99,7 +98,6 @@ public class UserController {
 		Optional<RestError> error = signupData.isDataValid(getRoutePath(SIGNUP_PATH), RequestMethod.POST);
 		if (error.isPresent()) {
 			response.sendError(HttpStatus.SC_BAD_REQUEST, error.get().toString());
-			return "";
 		} else {
 			String verificationToken = "testToken";
 			User user = userRepo.save(createNewUser(signupData, verificationToken));
@@ -107,6 +105,7 @@ public class UserController {
 			response.setStatus(HttpStatus.SC_CREATED);
 			return "User Created Successfully";
 		}
+		return null;
 	}
 	
 	private User createNewUser(SignupData signupData, String verificationToken) {
@@ -138,7 +137,7 @@ public class UserController {
 	}
 	
 	private String getRoutePath(String path) {
-		return BASE_PATH + "/" + path;
+		return BASE_PATH + path;
 	}
 	
 }
