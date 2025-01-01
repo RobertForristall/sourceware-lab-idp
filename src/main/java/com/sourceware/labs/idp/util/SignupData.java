@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sourceware.labs.idp.util.RestError.RestErrorBuilder;
 
 public class SignupData {
@@ -54,7 +54,6 @@ public class SignupData {
 	}
 	
 	private boolean isRecoveryPhoneValid() {
-		System.out.println(recoveryPhone);
 		if (recoveryPhone != null) {
 		    String patterns 
 		      = "^(\\+\\d{1,3}( )?)?((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$" 
@@ -208,7 +207,9 @@ public class SignupData {
 
 	@Override
 	public String toString() {
-		return new Gson().toJson(this);
+		return new GsonBuilder()
+				.setDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz")
+				.create().toJson(this);
 	}
 
 }
