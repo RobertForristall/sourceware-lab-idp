@@ -3,6 +3,7 @@ package com.sourceware.labs.idp.controller;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +36,7 @@ import com.sourceware.labs.idp.util.RestError.RestErrorBuilder;
 import com.sourceware.labs.idp.util.SignupData;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -67,6 +71,7 @@ public class UserController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 	private static final String BASE_PATH = "/user";
 	private static final String SIGNUP_PATH = "/signup";
+	private static final String VERIFY_PATH = "/verify";
 
 	@Autowired
 	private final UserRepo userRepo;
@@ -129,6 +134,34 @@ public class UserController {
 			}
 		}
 		return null;
+	}
+	
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "User is successfully verified", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
+		@ApiResponse(responseCode = "400", description = "User failed to verify", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))})
+	})
+	@Operation(summary = "Verify User Account", description = "Verify a new user's account")
+	@Tag(name = "get", description = "GET methods for User APIs")
+	@GetMapping(VERIFY_PATH)
+	String verify(@Parameter(description = "ID of the user to verify", required = true) @PathVariable Long userId,
+			@Parameter(description = "Verification token for the user to be verified", required = true) @PathVariable String verificationToken,
+			HttpServletResponse response) {
+		if (userId == null || verificationToken == null) {
+			// TODO handle null userId or null verificationToken
+			return "";
+		} else {
+			List<AccountVerification> verifications = accountVerificationRepo.findAccountVerificationByUserIdAndVerificationToken(userId, verificationToken);
+			if (verifications.size() == 1) {
+				User user = userRepo.getReferenceById(userId);
+				user.setVerified(true);
+				user = userRepo.save(user);
+				response.setStatus(HttpStatus.OK.value());
+				return "User successfully verified";
+			} else {
+				// TODO handle non-1 verifications size
+				return "";
+			}
+		}
 	}
 	
 	private User createNewUser(SignupData signupData, String verificationToken) {
