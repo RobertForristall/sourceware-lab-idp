@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolationException;
 
 /**
  * Spring rest controller for managing user authentication information
@@ -91,7 +93,8 @@ public class UserController {
 	
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "User successfully signed up", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
-		@ApiResponse(responseCode = "400", description = "User failed to be signed up", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))})
+		@ApiResponse(responseCode = "400", description = "User failed to be signed up", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))}),
+		@ApiResponse(responseCode = "409", description = "User provided an email that is already associated with an account", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))})
 	})
 	@Operation(summary = "Signup", description = "Signup a new user with the IDP service")
 	@Tag(name = "post", description = "POST methods for User APIs")
@@ -114,6 +117,12 @@ public class UserController {
 						response.sendError(HttpStatus.CONFLICT.value(), new RestErrorBuilder().setRoute(getRoutePath(SIGNUP_PATH)).setMethod(RequestMethod.POST).setErrorCode(5).setMsg("Error: A user with the provided email already exists").build().toString());
 					}
 					
+				} else if (ex.getClass().equals(TransactionSystemException.class)) {
+					TransactionSystemException transactionEx = (TransactionSystemException) ex;
+					if (transactionEx.getRootCause().getClass().equals(ConstraintViolationException.class)) {
+						ConstraintViolationException constraintEx = (ConstraintViolationException) transactionEx.getRootCause();
+						response.sendError(HttpStatus.BAD_REQUEST.value(), new RestErrorBuilder().setRoute(getRoutePath(SIGNUP_PATH)).setMethod(RequestMethod.POST).setErrorCode(6).setMsg("Error: " + constraintEx.getConstraintViolations().stream().findFirst().get().getMessageTemplate()).build().toString());
+					}
 				} else {
 					throw ex;
 				}
