@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -19,16 +20,22 @@ public class SecurityQuestion {
 	// Internal database ID for the user
 	private @Id @GeneratedValue @NotNull Long id;
 	
+	@NotBlank(message = "Security question 1 must be defined")
 	private String question1;
 	
+	@NotBlank(message = "Security question 2 must be defined")
 	private String question2;
 	
+	@NotBlank(message = "Security answer 1 must be defined")
 	private String answer1;
 	
+	@NotBlank(message = "Security answer 2 must be defined")
 	private String answer2;
 	
+	@NotNull(message = "All security questions should have an accurate created time")
 	private Timestamp created;
 	
+	@NotNull(message = "All security questions should have an up-to-date modified time")
 	private Timestamp modified;
 	
 	@OneToOne(mappedBy = "securityQuestion")
