@@ -43,7 +43,7 @@ public class SignupData {
 	}
 	
 	private boolean isUserOldEnough() {
-		return Period.between(dob.toInstant().atZone(ZoneId.of("Z")).toLocalDate(), new Date().toInstant().atZone(ZoneId.of("Z")).toLocalDate()).getYears() >= 18;
+		return this.dob != null && Period.between(dob.toInstant().atZone(ZoneId.of("Z")).toLocalDate(), new Date().toInstant().atZone(ZoneId.of("Z")).toLocalDate()).getYears() >= 18;
 	}
 	
 	private boolean isRecoveryEmailValid() {
