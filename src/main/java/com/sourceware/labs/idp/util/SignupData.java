@@ -80,6 +80,7 @@ public class SignupData {
 
 	public SignupData() {
 		super();
+		this.verificationToken = RandomStringUtils.secureStrong().nextAlphanumeric(50);
 	}
 
 	public SignupData(String email, String password, String firstName, String lastName, Date dob, String sq1,
