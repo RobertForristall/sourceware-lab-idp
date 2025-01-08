@@ -76,6 +76,9 @@ public abstract class BaseIdpApplicationTests {
 		Assertions.assertEquals(HttpStatusCode.valueOf(responseCode), result.getStatusCode());
 		RestError expectedError = getRestError(route, method, errorCode, msg);
 		RestError actualError = new Gson().fromJson(result.getBody(), HttpErrorResponse.class).getMessageAsRestError();
+		if (actualError == null) {
+			actualError = new Gson().fromJson(result.getBody(), RestError.class);
+		}
 		Assertions.assertEquals(expectedError, actualError);
 	}
 	
