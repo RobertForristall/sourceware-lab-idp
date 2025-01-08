@@ -3,6 +3,7 @@ package com.sourceware.labs.idp.controller;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,11 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.sourceware.labs.idp.entity.AccountVerification;
 import com.sourceware.labs.idp.entity.Role.Application;
@@ -33,11 +39,13 @@ import com.sourceware.labs.idp.util.RestError.RestErrorBuilder;
 import com.sourceware.labs.idp.util.SignupData;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 
@@ -67,6 +75,7 @@ public class UserController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 	private static final String BASE_PATH = "/user";
 	private static final String SIGNUP_PATH = "/signup";
+	private static final String VERIFY_PATH = "/verify/{userId}/{verificationToken}";
 
 	@Autowired
 	private final UserRepo userRepo;
@@ -104,10 +113,9 @@ public class UserController {
 		if (error.isPresent()) {
 			response.sendError(HttpStatus.BAD_REQUEST.value(), error.get().toString());
 		} else {
-			String verificationToken = "testToken";
 			try {
-				User user = userRepo.save(createNewUser(signupData, verificationToken));
-				awsEmailService.sendMessage(awsEmailService.createSimpleMailMessage(user.getEmail(), "Sourceware Labs IDP User Verification", awsEmailService.createVerificatioEmailBody(user.getId(), verificationToken)));
+				User user = userRepo.save(createNewUser(signupData));
+				awsEmailService.sendMessage(awsEmailService.createSimpleMailMessage(user.getEmail(), "Sourceware Labs IDP User Verification", awsEmailService.createVerificatioEmailBody(user.getId(), signupData.getVerificationToken())));
 				response.setStatus(HttpStatus.CREATED.value());
 				return "User Created Successfully";
 			} catch (Exception ex) {
@@ -131,7 +139,46 @@ public class UserController {
 		return null;
 	}
 	
-	private User createNewUser(SignupData signupData, String verificationToken) {
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "User is successfully verified", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
+		@ApiResponse(responseCode = "400", description = "User failed to verify", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))})
+	})
+	@Operation(summary = "Verify User Account", description = "Verify a new user's account")
+	@Tag(name = "get", description = "GET methods for User APIs")
+	@GetMapping(VERIFY_PATH)
+	String verify(@Parameter(description = "ID of the user to verify", required = true) @PathVariable Long userId,
+			@Parameter(description = "Verification token for the user to be verified", required = true) @PathVariable String verificationToken,
+			HttpServletResponse response) throws IOException {
+		// TODO Handle better error returning than just 404 if one of the path variables is null
+		List<AccountVerification> verifications = accountVerificationRepo.findAccountVerificationByUserIdAndVerificationToken(userId, verificationToken);
+		if (verifications.size() == 1) {
+			User user = userRepo.getReferenceById(userId);
+			user.setVerified(true);
+			user = userRepo.save(user);
+			response.setStatus(HttpStatus.OK.value());
+			return "User successfully verified";
+		} else {
+			response.sendError(HttpStatus.BAD_REQUEST.value(), new RestErrorBuilder().setRoute(getRoutePath(VERIFY_PATH)).setMethod(RequestMethod.GET).setErrorCode(3).setMsg("Error: no entry in account validation table found").build().toString());
+		}
+		return null;
+	}
+	
+	@ResponseStatus(value=HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public String handleError(HttpServletRequest req, MethodArgumentTypeMismatchException ex) {
+		if (req.getRequestURI().contains("verify")) {
+			RestErrorBuilder builder = new RestErrorBuilder().setRoute(getRoutePath(VERIFY_PATH)).setMethod(RequestMethod.GET);
+			if (ex.getLocalizedMessage().contains("userId")) {
+				builder.setErrorCode(1).setMsg("Error: user ID is not of type Integer");
+			} else {
+				builder.setErrorCode(2).setMsg("Error: verification token is not of type String");
+			}
+			return builder.build().toString();
+		}
+		return ex.getLocalizedMessage();
+	}
+	
+	private User createNewUser(SignupData signupData) {
 		Timestamp ts = new Timestamp(new Date().getTime());
 		User user = new User(
 				null,
@@ -155,12 +202,12 @@ public class UserController {
 				null);
 		user.setSecurityQuestion(sq);
 		user.setRoles(Set.of(roleRepo.findRoleByApplicationAndRole(Application.RealQuick, RoleName.User).get(0)));
-		user.setAccountVerification(new AccountVerification(null, verificationToken, user));
+		user.setAccountVerification(new AccountVerification(null, signupData.getVerificationToken(), user));
 		return user;
 	}
 	
 	private String getRoutePath(String path) {
-		return BASE_PATH + path;
+		return BASE_PATH + "/" + path.split("/")[1];
 	}
 	
 }
