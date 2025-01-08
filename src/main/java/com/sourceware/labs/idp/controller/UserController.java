@@ -109,10 +109,9 @@ public class UserController {
 		if (error.isPresent()) {
 			response.sendError(HttpStatus.BAD_REQUEST.value(), error.get().toString());
 		} else {
-			String verificationToken = "testToken";
 			try {
-				User user = userRepo.save(createNewUser(signupData, verificationToken));
-				awsEmailService.sendMessage(awsEmailService.createSimpleMailMessage(user.getEmail(), "Sourceware Labs IDP User Verification", awsEmailService.createVerificatioEmailBody(user.getId(), verificationToken)));
+				User user = userRepo.save(createNewUser(signupData));
+				awsEmailService.sendMessage(awsEmailService.createSimpleMailMessage(user.getEmail(), "Sourceware Labs IDP User Verification", awsEmailService.createVerificatioEmailBody(user.getId(), signupData.getVerificationToken())));
 				response.setStatus(HttpStatus.CREATED.value());
 				return "User Created Successfully";
 			} catch (Exception ex) {
@@ -164,7 +163,7 @@ public class UserController {
 		}
 	}
 	
-	private User createNewUser(SignupData signupData, String verificationToken) {
+	private User createNewUser(SignupData signupData) {
 		Timestamp ts = new Timestamp(new Date().getTime());
 		User user = new User(
 				null,
@@ -188,7 +187,7 @@ public class UserController {
 				null);
 		user.setSecurityQuestion(sq);
 		user.setRoles(Set.of(roleRepo.findRoleByApplicationAndRole(Application.RealQuick, RoleName.User).get(0)));
-		user.setAccountVerification(new AccountVerification(null, verificationToken, user));
+		user.setAccountVerification(new AccountVerification(null, signupData.getVerificationToken(), user));
 		return user;
 	}
 	

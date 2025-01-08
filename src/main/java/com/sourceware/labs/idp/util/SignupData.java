@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -37,6 +38,8 @@ public class SignupData {
 	private String recoveryEmail;
 	
 	private String recoveryPhone;
+	
+	private String verificationToken;
 	
 	private boolean isEmailValid() {
 		return EmailValidator.getInstance().isValid(email);
@@ -93,6 +96,7 @@ public class SignupData {
 		this.sa2 = sa2;
 		this.recoveryEmail = recoveryEmail;
 		this.recoveryPhone = recoveryPhone;
+		this.verificationToken = RandomStringUtils.secureStrong().nextAlphanumeric(50);
 	}
 
 	public String getEmail() {
@@ -181,6 +185,10 @@ public class SignupData {
 
 	public void setRecoveryPhone(String recoveryPhone) {
 		this.recoveryPhone = recoveryPhone;
+	}
+	
+	public String getVerificationToken() {
+		return verificationToken;
 	}
 
 	@Override
