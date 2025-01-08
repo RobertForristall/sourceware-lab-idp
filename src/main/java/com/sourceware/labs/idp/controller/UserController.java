@@ -71,7 +71,7 @@ public class UserController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 	private static final String BASE_PATH = "/user";
 	private static final String SIGNUP_PATH = "/signup";
-	private static final String VERIFY_PATH = "/verify";
+	private static final String VERIFY_PATH = "/verify/{userId}/{verificationToken}";
 
 	@Autowired
 	private final UserRepo userRepo;
