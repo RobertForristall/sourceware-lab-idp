@@ -30,11 +30,15 @@ import com.sourceware.labs.idp.util.SignupData;
 @TestMethodOrder(OrderAnnotation.class)
 public class SignupTests extends BaseIdpApplicationTests{
 
-	private URI testingRoute;
+	private String testingPath;
+	private RequestMethod testingMethod;
+	private URI fullTestingRoute;
 	
 	@BeforeAll
 	public void setup() throws URISyntaxException {
-		testingRoute = new URI(baseUrl + "user/signup");
+		testingPath = "/user/signup";
+		testingMethod = RequestMethod.POST;
+		fullTestingRoute = new URI(baseUrl + testingPath);
 	}
 	
 	@Test
@@ -42,7 +46,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 	public void createValidUser() throws Exception {
 		SignupData signupData = TestData.getTestSignupData();
 		HttpEntity<SignupData> request = new HttpEntity<>(signupData, new HttpHeaders());
-		ResponseEntity<String> result = this.restTemplate.postForEntity(testingRoute, request, String.class);
+		ResponseEntity<String> result = this.restTemplate.postForEntity(fullTestingRoute, request, String.class);
 		Assertions.assertEquals(HttpStatusCode.valueOf(201), result.getStatusCode());
 		Assertions.assertEquals("User Created Successfully", result.getBody());
 	}
@@ -52,7 +56,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		SignupData signupData = TestData.getTestSignupData();
 		signupData.setEmail(null);
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 1, "Error: User's email is not valid");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 1, "Error: User's email is not valid");
 	}
 	
 	@Test
@@ -60,7 +64,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		SignupData signupData = TestData.getTestSignupData();
 		signupData.setEmail("");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 1, "Error: User's email is not valid");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 1, "Error: User's email is not valid");
 	}
 	
 	@Test
@@ -68,14 +72,14 @@ public class SignupTests extends BaseIdpApplicationTests{
 		SignupData signupData = TestData.getTestSignupData();
 		signupData.setEmail("test@test");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 1, "Error: User's email is not valid");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 1, "Error: User's email is not valid");
 	}
 	
 	@Test
 	public void catchEmailIsNotUnique() {
 		SignupData signupData = TestData.getTestSignupData();
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 409, 5, "Error: A user with the provided email already exists");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 409, 5, "Error: A user with the provided email already exists");
 	}
 	
 	@Test
@@ -84,7 +88,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setPassword(null);
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: User's password must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: User's password must be defined");
 	}
 	
 	@Test
@@ -93,7 +97,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setPassword("");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: User's password must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: User's password must be defined");
 	}
 	
 	@Test
@@ -102,7 +106,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setFirstName(null);
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: User's first name must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: User's first name must be defined");
 	}
 	
 	@Test
@@ -111,7 +115,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setFirstName("");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: User's first name must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: User's first name must be defined");
 	}
 	
 	@Test
@@ -120,7 +124,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setLastName(null);
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: User's last name must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: User's last name must be defined");
 	}
 	
 	@Test
@@ -129,7 +133,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setLastName("");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: User's last name must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: User's last name must be defined");
 	}
 	
 	@Test
@@ -138,7 +142,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setDob(null);
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 2, "Error: User is not old enough");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 2, "Error: User is not old enough");
 	}
 	
 	@Test
@@ -147,7 +151,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setDob(new Date());
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 2, "Error: User is not old enough");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 2, "Error: User is not old enough");
 	}
 	
 	@Test
@@ -156,7 +160,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setSq1(null);
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: Security question 1 must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: Security question 1 must be defined");
 	}
 	
 	@Test
@@ -165,7 +169,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setSq1("");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: Security question 1 must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: Security question 1 must be defined");
 	}
 	
 	@Test
@@ -174,7 +178,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setSq2(null);
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: Security question 2 must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: Security question 2 must be defined");
 	}
 	
 	@Test
@@ -183,7 +187,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setSq2("");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: Security question 2 must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: Security question 2 must be defined");
 	}
 	
 	@Test
@@ -192,7 +196,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setSa1(null);
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: Security answer 1 must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: Security answer 1 must be defined");
 	}
 	
 	@Test
@@ -201,7 +205,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setSa1("");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: Security answer 1 must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: Security answer 1 must be defined");
 	}
 	
 	@Test
@@ -210,7 +214,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setSa2(null);
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: Security answer 2 must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: Security answer 2 must be defined");
 	}
 	
 	@Test
@@ -219,7 +223,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setSa2("");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 6, "Error: Security answer 2 must be defined");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 6, "Error: Security answer 2 must be defined");
 	}
 	
 	@Test
@@ -228,7 +232,7 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setRecoveryEmail("testing");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 3, "Error: User's recovery email is not valid");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 3, "Error: User's recovery email is not valid");
 	}
 	
 	@Test
@@ -237,23 +241,12 @@ public class SignupTests extends BaseIdpApplicationTests{
 		signupData.setEmail("test2@test.com");
 		signupData.setRecoveryPhone("123");
 		ResponseEntity<String> result = issueRequest(signupData);
-		assertRestErrorsEqual(result, 400, 4, "Error: User's recovery phone number is not valid");
+		assertRestErrorsEqual(result, testingPath, testingMethod, 400, 4, "Error: User's recovery phone number is not valid");
 	}
 	
 	private ResponseEntity<String> issueRequest(SignupData data) {
 		HttpEntity<SignupData> request = new HttpEntity<>(data, new HttpHeaders());
-		return this.restTemplate.postForEntity(testingRoute, request, String.class);
-	}
-	
-	private void assertRestErrorsEqual(ResponseEntity<String> result, int responseCode, int errorCode, String msg) {
-		Assertions.assertEquals(HttpStatusCode.valueOf(responseCode), result.getStatusCode());
-		RestError expectedError = getRestError(errorCode, msg);
-		RestError actualError = new Gson().fromJson(result.getBody(), HttpErrorResponse.class).getMessageAsRestError();
-		Assertions.assertEquals(expectedError, actualError);
-	}
-	
-	private RestError getRestError(int code, String msg) {
-		return new RestErrorBuilder().setRoute("/user/signup").setMethod(RequestMethod.POST).setErrorCode(code).setMsg(msg).build();
+		return this.restTemplate.postForEntity(fullTestingRoute, request, String.class);
 	}
 	
 }
