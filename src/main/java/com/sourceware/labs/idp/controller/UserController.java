@@ -1,30 +1,45 @@
 package com.sourceware.labs.idp.controller;
 
-import java.util.List;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sourceware.labs.idp.entity.AccountVerification;
+import com.sourceware.labs.idp.entity.Role.Application;
+import com.sourceware.labs.idp.entity.Role.RoleName;
+import com.sourceware.labs.idp.entity.SecurityQuestion;
 import com.sourceware.labs.idp.entity.User;
+import com.sourceware.labs.idp.repo.AccountVerificationRepo;
+import com.sourceware.labs.idp.repo.RoleRepo;
 import com.sourceware.labs.idp.repo.UserRepo;
+import com.sourceware.labs.idp.service.AuthService;
 import com.sourceware.labs.idp.service.AwsEmailService;
+import com.sourceware.labs.idp.util.RestError;
+import com.sourceware.labs.idp.util.RestError.RestErrorBuilder;
+import com.sourceware.labs.idp.util.SignupData;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolationException;
 
 /**
  * Spring rest controller for managing user authentication information
@@ -46,48 +61,106 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Robert Forristall (robert.s.forristall@gmail.com)
  */
 @RestController
+@RequestMapping(path = "/user")
 public class UserController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+	private static final String BASE_PATH = "/user";
+	private static final String SIGNUP_PATH = "/signup";
 
-	private final UserRepo repo;
+	@Autowired
+	private final UserRepo userRepo;
 	
 	@Autowired
-	private AwsEmailService awsEmailService;
+	private final RoleRepo roleRepo;
 	
-	UserController(UserRepo repo) {
-		this.repo = repo;
-	}
+	@Autowired
+	private final AccountVerificationRepo accountVerificationRepo;
 	
-	@Operation(summary = "Get all Users", description = "Get all users and return them as a JSON array")
-	@Tag(name = "get", description = "GET methods for User APIs")
-	@GetMapping("/user")
-	List<User> all() {
-		LOGGER.info("in GET /user ...");
-		return repo.findAll();
+	@Autowired
+	private final AwsEmailService awsEmailService;
+	
+	@Autowired
+	private final AuthService authService;
+	
+	UserController(UserRepo userRepo, RoleRepo roleRepo, AccountVerificationRepo accountVerificationRepo, AwsEmailService awsEmailService, AuthService authService) {
+		this.userRepo = userRepo;
+		this.roleRepo = roleRepo;
+		this.accountVerificationRepo = accountVerificationRepo;
+		this.awsEmailService = awsEmailService;
+		this.authService = authService;
 	}
 	
 	@ApiResponses({
-	       @ApiResponse(responseCode = "200", content = { @Content(mediaType = "application/json",
-	               schema = @Schema(implementation = User.class)) }),
-	       @ApiResponse(responseCode = "404", description = "User not found",
-	               content = @Content) })
-	@Tag(name = "get", description = "GET methods for User APIs")
-	@GetMapping("/user/{userId}")
-	User user(@Parameter(
-		       description = "ID of user to be retrieved",
-		       required = true)
-		@PathVariable long userId) {
-		LOGGER.info("in GET /user single ...");
-		return repo.findById(userId).orElseThrow(() -> new RuntimeException("User id not found: " + userId));
+		@ApiResponse(responseCode = "201", description = "User successfully signed up", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
+		@ApiResponse(responseCode = "400", description = "User failed to be signed up", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))}),
+		@ApiResponse(responseCode = "409", description = "User provided an email that is already associated with an account", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))})
+	})
+	@Operation(summary = "Signup", description = "Signup a new user with the IDP service")
+	@Tag(name = "post", description = "POST methods for User APIs")
+	@PostMapping(SIGNUP_PATH)
+	String signup(@RequestBody SignupData signupData, HttpServletResponse response) throws IOException {
+		Optional<RestError> error = signupData.isDataValid(getRoutePath(SIGNUP_PATH), RequestMethod.POST);
+		if (error.isPresent()) {
+			response.sendError(HttpStatus.BAD_REQUEST.value(), error.get().toString());
+		} else {
+			String verificationToken = "testToken";
+			try {
+				User user = userRepo.save(createNewUser(signupData, verificationToken));
+				awsEmailService.sendMessage(awsEmailService.createSimpleMailMessage(user.getEmail(), "Sourceware Labs IDP User Verification", awsEmailService.createVerificatioEmailBody(user.getId(), verificationToken)));
+				response.setStatus(HttpStatus.CREATED.value());
+				return "User Created Successfully";
+			} catch (Exception ex) {
+				if (ex.getClass().equals(DataIntegrityViolationException.class)) {
+					// TODO find a better way to catch this SQL error than parsing the message
+					if (ex.getLocalizedMessage().contains("Detail: Key (email)=("+signupData.getEmail()+") already exists")) {
+						response.sendError(HttpStatus.CONFLICT.value(), new RestErrorBuilder().setRoute(getRoutePath(SIGNUP_PATH)).setMethod(RequestMethod.POST).setErrorCode(5).setMsg("Error: A user with the provided email already exists").build().toString());
+					}
+					
+				} else if (ex.getClass().equals(TransactionSystemException.class)) {
+					TransactionSystemException transactionEx = (TransactionSystemException) ex;
+					if (transactionEx.getRootCause().getClass().equals(ConstraintViolationException.class)) {
+						ConstraintViolationException constraintEx = (ConstraintViolationException) transactionEx.getRootCause();
+						response.sendError(HttpStatus.BAD_REQUEST.value(), new RestErrorBuilder().setRoute(getRoutePath(SIGNUP_PATH)).setMethod(RequestMethod.POST).setErrorCode(6).setMsg("Error: " + constraintEx.getConstraintViolations().stream().findFirst().get().getMessageTemplate()).build().toString());
+					}
+				} else {
+					throw ex;
+				}
+			}
+		}
+		return null;
 	}
 	
-	@Tag(name = "post", description = "POST method for adding a new user")
-	@PostMapping("user")
-	User newUser(@RequestBody User newUser, HttpServletResponse response) {
-		LOGGER.info("in POST /user ...");
-		User user = repo.save(newUser);
-		response.setStatus(HttpStatus.CREATED.value());
+	private User createNewUser(SignupData signupData, String verificationToken) {
+		Timestamp ts = new Timestamp(new Date().getTime());
+		User user = new User(
+				null,
+				signupData.getEmail(),
+				signupData.getPassword(),
+				false,
+				signupData.getFirstName(),
+				signupData.getLastName(),
+				signupData.getDob(),
+				ts,
+				ts
+				);
+		SecurityQuestion sq = new SecurityQuestion(
+				null,
+				signupData.getSq1(),
+				signupData.getSq2(),
+				signupData.getSa1(),
+				signupData.getSa2(),
+				ts,
+				ts,
+				null);
+		user.setSecurityQuestion(sq);
+		user.setRoles(Set.of(roleRepo.findRoleByApplicationAndRole(Application.RealQuick, RoleName.User).get(0)));
+		user.setAccountVerification(new AccountVerification(null, verificationToken, user));
 		return user;
 	}
+	
+	private String getRoutePath(String path) {
+		return BASE_PATH + path;
+	}
+	
 }

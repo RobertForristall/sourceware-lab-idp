@@ -31,7 +31,7 @@ public class AwsEmailService {
 	 * @param simpleMailMessage - The message information to be sent
 	 */
 	public void sendMessage(SimpleMailMessage simpleMailMessage) {
-		LOGGER.info("Sending email to addresses: " + simpleMailMessage.getTo());
+		LOGGER.info("Sending email to addresses: " + simpleMailMessage.getTo()[0]);
 		this.mailSender.send(simpleMailMessage);
 	}
 	
@@ -50,6 +50,13 @@ public class AwsEmailService {
 		simpleMailMessage.setSubject(subject);
 		simpleMailMessage.setText(body);
 		return simpleMailMessage;
+	}
+	
+	public String createVerificatioEmailBody(Long userId, String verificationToken) {
+		StringBuilder b = new StringBuilder();
+		b.append("<h1>Sourceware Labs IDP</h1>\n");
+		b.append("<p>Click the following link to verify your account: http://localhost:8080/user/verify?userId="+userId+ "&verificationToken="+verificationToken+"</p>\n");
+		return b.toString();
 	}
 	
 }
