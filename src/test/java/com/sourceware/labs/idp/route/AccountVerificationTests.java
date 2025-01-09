@@ -45,7 +45,7 @@ public class AccountVerificationTests extends BaseIdpApplicationTests{
 		Assertions.assertEquals(HttpStatusCode.valueOf(201), result.getStatusCode());
 		Assertions.assertEquals("User Created Successfully", result.getBody());
 		verificationToken = signupData.getVerificationToken();
-		userId = Long.valueOf(1);
+		userId = Long.valueOf(userRepo.findAll().get(0).getId());
 	}
 	
 	@AfterAll
