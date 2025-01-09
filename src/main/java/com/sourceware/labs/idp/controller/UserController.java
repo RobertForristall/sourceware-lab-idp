@@ -158,7 +158,9 @@ public class UserController {
 			response.setStatus(HttpStatus.OK.value());
 			return "User successfully verified";
 		} else {
-			response.sendError(HttpStatus.BAD_REQUEST.value(), new RestErrorBuilder().setRoute(getRoutePath(VERIFY_PATH)).setMethod(RequestMethod.GET).setErrorCode(3).setMsg("Error: no entry in account validation table found").build().toString());
+			RestError restError = new RestErrorBuilder().setRoute(getRoutePath(VERIFY_PATH)).setMethod(RequestMethod.GET).setErrorCode(3).setMsg("Error: no entry in account validation table found").build();
+			LOGGER.error(restError.toString());
+			response.sendError(HttpStatus.BAD_REQUEST.value(), restError.toString());
 		}
 		return null;
 	}
@@ -173,8 +175,11 @@ public class UserController {
 			} else {
 				builder.setErrorCode(2).setMsg("Error: verification token is not of type String");
 			}
-			return builder.build().toString();
+			RestError restError = builder.build();
+			LOGGER.error(restError.toString());
+			return restError.toString();
 		}
+		LOGGER.error(ex.getLocalizedMessage());
 		return ex.getLocalizedMessage();
 	}
 	
