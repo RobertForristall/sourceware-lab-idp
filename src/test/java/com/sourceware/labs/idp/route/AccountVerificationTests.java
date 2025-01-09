@@ -3,6 +3,7 @@ package com.sourceware.labs.idp.route;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -45,6 +46,11 @@ public class AccountVerificationTests extends BaseIdpApplicationTests{
 		Assertions.assertEquals("User Created Successfully", result.getBody());
 		verificationToken = signupData.getVerificationToken();
 		userId = Long.valueOf(1);
+	}
+	
+	@AfterAll
+	public void cleanup() {
+		userRepo.deleteAll();
 	}
 	
 	@Test
