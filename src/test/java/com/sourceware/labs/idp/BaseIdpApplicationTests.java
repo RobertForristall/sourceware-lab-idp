@@ -5,16 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.google.gson.Gson;
+import com.sourceware.labs.idp.repo.UserRepo;
 import com.sourceware.labs.idp.service.AwsEmailService;
 import com.sourceware.labs.idp.util.HttpErrorResponse;
 import com.sourceware.labs.idp.util.RestError;
@@ -42,15 +42,21 @@ import com.sourceware.labs.idp.util.RestError.RestErrorBuilder;
 		    "keystore.key.token.password=testKeyPass",
 		    "spring.datasource.hikari.schema=public"
 		  })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class BaseIdpApplicationTests {
 
 	/**
 	 * Test container created in docker that contains a MySQL database whose connection properties
 	 * are injected into the Spring server for testing database interaction
 	 */
-	@Container
-	@ServiceConnection
-	protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer("postgres:17");
+	protected static PostgreSQLContainer<?> postgres;
+	static {
+		postgres = new PostgreSQLContainer("postgres:17");
+		postgres.start();
+        System.setProperty("spring.datasource.url", postgres.getJdbcUrl());
+        System.setProperty("spring.datasource.password", postgres.getPassword());
+        System.setProperty("spring.datasource.username", postgres.getUsername());
+	}
 
 	/**
 	 * The port that the server is running on
@@ -63,6 +69,9 @@ public abstract class BaseIdpApplicationTests {
 	 */
 	@Autowired
 	protected TestRestTemplate restTemplate;
+	
+	@Autowired
+	protected UserRepo userRepo;
 	
 	@MockitoBean
 	protected AwsEmailService awsEmailService;

@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -18,12 +19,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.google.gson.Gson;
 import com.sourceware.labs.idp.BaseIdpApplicationTests;
 import com.sourceware.labs.idp.test.data.TestData;
-import com.sourceware.labs.idp.util.HttpErrorResponse;
-import com.sourceware.labs.idp.util.RestError;
-import com.sourceware.labs.idp.util.RestError.RestErrorBuilder;
 import com.sourceware.labs.idp.util.SignupData;
 
 @TestInstance(Lifecycle.PER_CLASS)
@@ -39,6 +36,11 @@ public class SignupTests extends BaseIdpApplicationTests{
 		testingPath = "/user/signup";
 		testingMethod = RequestMethod.POST;
 		fullTestingRoute = new URI(baseUrl + testingPath);
+	}
+	
+	@AfterAll
+	public void cleanup() {
+		userRepo.deleteAll();
 	}
 	
 	@Test
