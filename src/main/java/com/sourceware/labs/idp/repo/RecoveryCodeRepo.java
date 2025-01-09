@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.sourceware.labs.idp.entity.RecoveryCode;
 
-public interface RecoveryCodeRepo extends JpaRepository<RecoveryCode, Long>{
+public interface RecoveryCodeRepo extends JpaRepository<RecoveryCode, Long> {
 
 }

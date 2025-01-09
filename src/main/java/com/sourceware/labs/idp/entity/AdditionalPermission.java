@@ -20,84 +20,86 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "AdditionalPermissions")
 public class AdditionalPermission {
 
-	private @Id @GeneratedValue @NotNull Long id;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(name = "application")
-	private Application application;
-	
-	private String permission;
-	
-	@ManyToMany
-	private Set<User> users;
+  private @Id @GeneratedValue @NotNull Long id;
 
-	public AdditionalPermission() {
-		super();
-	}
+  @Enumerated(EnumType.STRING)
+  @Column(name = "application")
+  private Application application;
 
-	public AdditionalPermission(@NotNull Long id, Application application, String permission, Set<User> users) {
-		super();
-		this.id = id;
-		this.application = application;
-		this.permission = permission;
-		this.users = users;
-	}
+  private String permission;
 
-	public Long getId() {
-		return id;
-	}
+  @ManyToMany
+  private Set<User> users;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public AdditionalPermission() {
+    super();
+  }
 
-	public Application getApplication() {
-		return application;
-	}
+  public AdditionalPermission(
+          @NotNull Long id,
+          Application application,
+          String permission,
+          Set<User> users) {
+    super();
+    this.id = id;
+    this.application = application;
+    this.permission = permission;
+    this.users = users;
+  }
 
-	public void setApplication(Application application) {
-		this.application = application;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public String getPermission() {
-		return permission;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public void setPermission(String permission) {
-		this.permission = permission;
-	}
+  public Application getApplication() {
+    return application;
+  }
 
-	public Set<User> getUsers() {
-		return users;
-	}
+  public void setApplication(Application application) {
+    this.application = application;
+  }
 
-	public void setUsers(Set<User> users) {
-		this.users = users;
-	}
+  public String getPermission() {
+    return permission;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(application, id, permission, users);
-	}
+  public void setPermission(String permission) {
+    this.permission = permission;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		AdditionalPermission other = (AdditionalPermission) obj;
-		return application == other.application && Objects.equals(id, other.id)
-				&& Objects.equals(permission, other.permission) && Objects.equals(users, other.users);
-	}
+  public Set<User> getUsers() {
+    return users;
+  }
 
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
-	}
-	
-	
-	
+  public void setUsers(Set<User> users) {
+    this.users = users;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(application, id, permission, users);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    AdditionalPermission other = (AdditionalPermission) obj;
+    return application == other.application && Objects.equals(id, other.id)
+            && Objects.equals(permission, other.permission) && Objects.equals(users, other.users);
+  }
+
+  @Override
+  public String toString() {
+    return new Gson().toJson(this);
+  }
+
 }
