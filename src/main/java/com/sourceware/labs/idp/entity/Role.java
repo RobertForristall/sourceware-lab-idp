@@ -18,134 +18,138 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Table(name = "Roles")
 public class Role {
-	
-	public enum Application {
-		RealQuick ("RealQuick");
-		
-		private final String name;
-		
-		private Application(String s) {
-			name = s;
-		}
-		
-		public boolean equalsName(String otherName) {
-			return name.equals(otherName);
-		}
-		
-		public String toString() {
-			return name;
-		}
-	}
-	
-	public enum RoleName {
-		User ("User"), 
-		Admin ("Admin");
-		
-		private final String name;
-		
-		private RoleName(String s) {
-			name = s;
-		}
-		
-		public boolean equalsName(String otherName) {
-			return name.equals(otherName);
-		}
-		
-		public String toString() {
-			return name;
-		}
-	}
 
-	private @Id @GeneratedValue @NotNull Long id;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(name = "application")
-	private Application application;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(name = "role")
-	private RoleName role;
-	
-	private String roleDescription;
-	
-	@ManyToMany
-	private Set<User> users;
+  public enum Application {
+    RealQuick("RealQuick");
 
-	public Role() {
-		super();
-	}
+    private final String name;
 
-	public Role(@NotNull Long id, Application application, RoleName role, String roleDescription, Set<User> users) {
-		super();
-		this.id = id;
-		this.application = application;
-		this.role = role;
-		this.roleDescription = roleDescription;
-		this.users = users;
-	}
+    private Application(String s) {
+      name = s;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public boolean equalsName(String otherName) {
+      return name.equals(otherName);
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public String toString() {
+      return name;
+    }
+  }
 
-	public Application getApplication() {
-		return application;
-	}
+  public enum RoleName {
+    User("User"), Admin("Admin");
 
-	public void setApplication(Application application) {
-		this.application = application;
-	}
+    private final String name;
 
-	public RoleName getRole() {
-		return role;
-	}
+    private RoleName(String s) {
+      name = s;
+    }
 
-	public void setRole(RoleName role) {
-		this.role = role;
-	}
+    public boolean equalsName(String otherName) {
+      return name.equals(otherName);
+    }
 
-	public String getRoleDescription() {
-		return roleDescription;
-	}
+    public String toString() {
+      return name;
+    }
+  }
 
-	public void setRoleDescription(String roleDescription) {
-		this.roleDescription = roleDescription;
-	}
+  private @Id @GeneratedValue @NotNull Long id;
 
-	public Set<User> getUsers() {
-		return users;
-	}
+  @Enumerated(EnumType.STRING)
+  @Column(name = "application")
+  private Application application;
 
-	public void setUsers(Set<User> users) {
-		this.users = users;
-	}
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role")
+  private RoleName role;
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(application, id, role, roleDescription, users);
-	}
+  private String roleDescription;
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Role other = (Role) obj;
-		return application == other.application && Objects.equals(id, other.id) && role == other.role
-				&& Objects.equals(roleDescription, other.roleDescription) && Objects.equals(users, other.users);
-	}
+  @ManyToMany
+  private Set<User> users;
 
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
-	}
-	
-	
+  public Role() {
+    super();
+  }
+
+  public Role(
+          @NotNull Long id,
+          Application application,
+          RoleName role,
+          String roleDescription,
+          Set<User> users) {
+    super();
+    this.id = id;
+    this.application = application;
+    this.role = role;
+    this.roleDescription = roleDescription;
+    this.users = users;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public Application getApplication() {
+    return application;
+  }
+
+  public void setApplication(Application application) {
+    this.application = application;
+  }
+
+  public RoleName getRole() {
+    return role;
+  }
+
+  public void setRole(RoleName role) {
+    this.role = role;
+  }
+
+  public String getRoleDescription() {
+    return roleDescription;
+  }
+
+  public void setRoleDescription(String roleDescription) {
+    this.roleDescription = roleDescription;
+  }
+
+  public Set<User> getUsers() {
+    return users;
+  }
+
+  public void setUsers(Set<User> users) {
+    this.users = users;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(application, id, role, roleDescription, users);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Role other = (Role) obj;
+    return application == other.application && Objects.equals(id, other.id) && role == other.role
+            && Objects.equals(roleDescription, other.roleDescription)
+            && Objects.equals(users, other.users);
+  }
+
+  @Override
+  public String toString() {
+    return new Gson().toJson(this);
+  }
+
 }

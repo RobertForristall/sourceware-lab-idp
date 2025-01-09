@@ -16,95 +16,100 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "RecoveryEmails")
 public class RecoveryEmail {
 
-	// Internal database ID for the user
-	private @Id @GeneratedValue @NotNull Long id;
+  // Internal database ID for the user
+  private @Id @GeneratedValue @NotNull Long id;
 
-	private String email;
-	
-	private boolean verified;
-	
-	private Timestamp created;
-	
-	private Timestamp modified;
-	
-	@OneToOne(mappedBy = "recoveryEmail")
-	private User user;
-	
-	public RecoveryEmail() {
-		super();
-	}
+  private String email;
 
-	public RecoveryEmail(@NotNull Long id, String email, boolean verified, Timestamp created, Timestamp modified) {
-		super();
-		this.id = id;
-		this.email = email;
-		this.verified = verified;
-		this.created = created;
-		this.modified = modified;
-	}
+  private boolean verified;
 
-	public Long getId() {
-		return id;
-	}
+  private Timestamp created;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  private Timestamp modified;
 
-	public String getEmail() {
-		return email;
-	}
+  @OneToOne(mappedBy = "recoveryEmail")
+  private User user;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+  public RecoveryEmail() {
+    super();
+  }
 
-	public boolean isVerified() {
-		return verified;
-	}
+  public RecoveryEmail(
+          @NotNull Long id,
+          String email,
+          boolean verified,
+          Timestamp created,
+          Timestamp modified) {
+    super();
+    this.id = id;
+    this.email = email;
+    this.verified = verified;
+    this.created = created;
+    this.modified = modified;
+  }
 
-	public void setVerified(boolean verified) {
-		this.verified = verified;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public Timestamp getCreated() {
-		return created;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public void setCreated(Timestamp created) {
-		this.created = created;
-	}
+  public String getEmail() {
+    return email;
+  }
 
-	public Timestamp getModified() {
-		return modified;
-	}
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-	public void setModified(Timestamp modified) {
-		this.modified = modified;
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(created, email, id, modified, verified);
-	}
+  public boolean isVerified() {
+    return verified;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RecoveryEmail other = (RecoveryEmail) obj;
-		return Objects.equals(created, other.created) && Objects.equals(email, other.email)
-				&& Objects.equals(id, other.id) && Objects.equals(modified, other.modified)
-				&& verified == other.verified;
-	}
-	
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
-	}
-	
+  public void setVerified(boolean verified) {
+    this.verified = verified;
+  }
+
+  public Timestamp getCreated() {
+    return created;
+  }
+
+  public void setCreated(Timestamp created) {
+    this.created = created;
+  }
+
+  public Timestamp getModified() {
+    return modified;
+  }
+
+  public void setModified(Timestamp modified) {
+    this.modified = modified;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(created, email, id, modified, verified);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    RecoveryEmail other = (RecoveryEmail) obj;
+    return Objects.equals(created, other.created) && Objects.equals(email, other.email)
+            && Objects.equals(id, other.id) && Objects.equals(modified, other.modified)
+            && verified == other.verified;
+  }
+
+  @Override
+  public String toString() {
+    return new Gson().toJson(this);
+  }
+
 }

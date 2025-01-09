@@ -9,6 +9,6 @@ import com.sourceware.labs.idp.entity.User;
  *
  * @author Robert Forristall (robert.s.forristall@gmail.com)
  */
-public interface UserRepo extends JpaRepository<User, Long>{
+public interface UserRepo extends JpaRepository<User, Long> {
 
 }

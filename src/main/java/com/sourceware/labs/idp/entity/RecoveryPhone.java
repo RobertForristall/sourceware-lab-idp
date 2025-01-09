@@ -16,96 +16,100 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "RecoveryPhones")
 public class RecoveryPhone {
 
-	// Internal database ID for the user
-	private @Id @GeneratedValue @NotNull Long id;
-	
-	private String phoneNumber;
-	
-	private boolean verified;
-	
-	private Timestamp created;
-	
-	private Timestamp modified;
-	
-	@OneToOne(mappedBy = "recoveryPhone")
-	private User user;
-	
-	public RecoveryPhone() {
-		super();
-	}
+  // Internal database ID for the user
+  private @Id @GeneratedValue @NotNull Long id;
 
-	public RecoveryPhone(@NotNull Long id, String phoneNumber, boolean verified, Timestamp created,
-			Timestamp modified) {
-		super();
-		this.id = id;
-		this.phoneNumber = phoneNumber;
-		this.verified = verified;
-		this.created = created;
-		this.modified = modified;
-	}
+  private String phoneNumber;
 
-	public Long getId() {
-		return id;
-	}
+  private boolean verified;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  private Timestamp created;
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
+  private Timestamp modified;
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+  @OneToOne(mappedBy = "recoveryPhone")
+  private User user;
 
-	public boolean isVerified() {
-		return verified;
-	}
+  public RecoveryPhone() {
+    super();
+  }
 
-	public void setVerified(boolean verified) {
-		this.verified = verified;
-	}
+  public RecoveryPhone(
+          @NotNull Long id,
+          String phoneNumber,
+          boolean verified,
+          Timestamp created,
+          Timestamp modified) {
+    super();
+    this.id = id;
+    this.phoneNumber = phoneNumber;
+    this.verified = verified;
+    this.created = created;
+    this.modified = modified;
+  }
 
-	public Timestamp getCreated() {
-		return created;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public void setCreated(Timestamp created) {
-		this.created = created;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public Timestamp getModified() {
-		return modified;
-	}
+  public String getPhoneNumber() {
+    return phoneNumber;
+  }
 
-	public void setModified(Timestamp modified) {
-		this.modified = modified;
-	}
+  public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(created, id, modified, phoneNumber, verified);
-	}
+  public boolean isVerified() {
+    return verified;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RecoveryPhone other = (RecoveryPhone) obj;
-		return Objects.equals(created, other.created) && Objects.equals(id, other.id)
-				&& Objects.equals(modified, other.modified) && Objects.equals(phoneNumber, other.phoneNumber)
-				&& verified == other.verified;
-	}
+  public void setVerified(boolean verified) {
+    this.verified = verified;
+  }
 
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
-	}
-	
+  public Timestamp getCreated() {
+    return created;
+  }
+
+  public void setCreated(Timestamp created) {
+    this.created = created;
+  }
+
+  public Timestamp getModified() {
+    return modified;
+  }
+
+  public void setModified(Timestamp modified) {
+    this.modified = modified;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(created, id, modified, phoneNumber, verified);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    RecoveryPhone other = (RecoveryPhone) obj;
+    return Objects.equals(created, other.created) && Objects.equals(id, other.id)
+            && Objects.equals(modified, other.modified)
+            && Objects.equals(phoneNumber, other.phoneNumber) && verified == other.verified;
+  }
+
+  @Override
+  public String toString() {
+    return new Gson().toJson(this);
+  }
+
 }

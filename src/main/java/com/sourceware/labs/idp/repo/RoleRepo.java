@@ -8,6 +8,6 @@ import com.sourceware.labs.idp.entity.Role;
 import com.sourceware.labs.idp.entity.Role.Application;
 import com.sourceware.labs.idp.entity.Role.RoleName;
 
-public interface RoleRepo extends JpaRepository<Role, Long>{
-	List<Role> findRoleByApplicationAndRole(Application application, RoleName role);
+public interface RoleRepo extends JpaRepository<Role, Long> {
+  List<Role> findRoleByApplicationAndRole(Application application, RoleName role);
 }

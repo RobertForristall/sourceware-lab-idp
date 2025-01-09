@@ -20,86 +20,89 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "RecoveryVerification")
 public class RecoveryVerification {
 
-	// Internal database ID for the user
-	private @Id @GeneratedValue @NotNull Long id;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(name = "recoveryType")
-	private RecoveryType recoveryType;
-	
-	private String verificationToken;
-	
-	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+  // Internal database ID for the user
+  private @Id @GeneratedValue @NotNull Long id;
 
-	public RecoveryVerification() {
-		super();
-	}
+  @Enumerated(EnumType.STRING)
+  @Column(name = "recoveryType")
+  private RecoveryType recoveryType;
 
-	public RecoveryVerification(@NotNull Long id, RecoveryType recoveryType, String verificationToken, User user) {
-		super();
-		this.id = id;
-		this.recoveryType = recoveryType;
-		this.verificationToken = verificationToken;
-		this.user = user;
-	}
+  private String verificationToken;
 
-	public Long getId() {
-		return id;
-	}
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public RecoveryVerification() {
+    super();
+  }
 
-	public RecoveryType getRecoveryType() {
-		return recoveryType;
-	}
+  public RecoveryVerification(
+          @NotNull Long id,
+          RecoveryType recoveryType,
+          String verificationToken,
+          User user) {
+    super();
+    this.id = id;
+    this.recoveryType = recoveryType;
+    this.verificationToken = verificationToken;
+    this.user = user;
+  }
 
-	public void setRecoveryType(RecoveryType recoveryType) {
-		this.recoveryType = recoveryType;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public String getVerificationToken() {
-		return verificationToken;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public void setVerificationToken(String verificationToken) {
-		this.verificationToken = verificationToken;
-	}
+  public RecoveryType getRecoveryType() {
+    return recoveryType;
+  }
 
-	public User getUser() {
-		return user;
-	}
+  public void setRecoveryType(RecoveryType recoveryType) {
+    this.recoveryType = recoveryType;
+  }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+  public String getVerificationToken() {
+    return verificationToken;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, recoveryType, user, verificationToken);
-	}
+  public void setVerificationToken(String verificationToken) {
+    this.verificationToken = verificationToken;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RecoveryVerification other = (RecoveryVerification) obj;
-		return Objects.equals(id, other.id) && recoveryType == other.recoveryType && Objects.equals(user, other.user)
-				&& Objects.equals(verificationToken, other.verificationToken);
-	}
+  public User getUser() {
+    return user;
+  }
 
-	@Override
-	public String toString() {
-		return new Gson().toJson(this);
-	}
-	
-	
-	
+  public void setUser(User user) {
+    this.user = user;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, recoveryType, user, verificationToken);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    RecoveryVerification other = (RecoveryVerification) obj;
+    return Objects.equals(id, other.id) && recoveryType == other.recoveryType
+            && Objects.equals(user, other.user)
+            && Objects.equals(verificationToken, other.verificationToken);
+  }
+
+  @Override
+  public String toString() {
+    return new Gson().toJson(this);
+  }
+
 }

@@ -7,46 +7,51 @@ package com.sourceware.labs.idp.keystore;
  */
 public class IdpKeyStoreData {
 
-	private String storeDir;
-	private String storeFileName;
-	private String storePassword;
-	private String keyAlias;
-	private String keyPassword;
-	private String keyId;
+  private String storeDir;
+  private String storeFileName;
+  private String storePassword;
+  private String keyAlias;
+  private String keyPassword;
+  private String keyId;
 
-	public IdpKeyStoreData(String storeDir, String storeFileName, String storePassword, String keyAlias, String keyPassword,
-			String keyId) {
-		super();
-		this.storeDir = storeDir;
-		this.storeFileName = storeFileName;
-		this.storePassword = storePassword;
-		this.keyAlias = keyAlias;
-		this.keyPassword = keyPassword;
-		this.keyId = keyId;
-	}
-	
-	public String getStoreDir() {
-		return storeDir;
-	}
+  public IdpKeyStoreData(
+          String storeDir,
+          String storeFileName,
+          String storePassword,
+          String keyAlias,
+          String keyPassword,
+          String keyId) {
+    super();
+    this.storeDir = storeDir;
+    this.storeFileName = storeFileName;
+    this.storePassword = storePassword;
+    this.keyAlias = keyAlias;
+    this.keyPassword = keyPassword;
+    this.keyId = keyId;
+  }
 
-	public String getStoreFileName() {
-		return storeFileName;
-	}
+  public String getStoreDir() {
+    return storeDir;
+  }
 
-	public String getStorePassword() {
-		return storePassword;
-	}
+  public String getStoreFileName() {
+    return storeFileName;
+  }
 
-	public String getKeyAlias() {
-		return keyAlias;
-	}
+  public String getStorePassword() {
+    return storePassword;
+  }
 
-	public String getKeyPassword() {
-		return keyPassword;
-	}
+  public String getKeyAlias() {
+    return keyAlias;
+  }
 
-	public String getKeyId() {
-		return keyId;
-	}
+  public String getKeyPassword() {
+    return keyPassword;
+  }
+
+  public String getKeyId() {
+    return keyId;
+  }
 
 }
