@@ -63,9 +63,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-freemarker</artifactId>
 		</dependency>
+		<!--
 		<dependency>
-			<groupId>io.awspring.cloud</groupId>
-			<artifactId>spring-cloud-starter-aws-ses</artifactId>
+		    <groupId>io.awspring.cloud</groupId>
+		    <artifactId>spring-cloud-aws-starter-ses</artifactId>
+		    <version>3.2.1</version>
+		</dependency>
+		-->
+		<dependency>
+		    <groupId>io.awspring.cloud</groupId>
+		    <artifactId>spring-cloud-starter-aws-ses</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -116,12 +123,15 @@
 			<artifactId>aws-java-sdk-s3</artifactId>
 			<version>1.12.261</version>
 		</dependency>
+		<!-- IMPORTANT: This library will reach EOL on 12/31/2025; look for other options in the future
+				- system property aws.java.v1.disableDeprecationAnnouncement=true added to remove the warning being logged (NOT WORKING)-->
 		<dependency>
-			<groupId>software.amazon.ion</groupId>
-			<artifactId>ion-java</artifactId>
-			<version>1.0.2</version>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-java-sdk-core</artifactId>
+		    <version>1.12.780</version>
 		</dependency>
-		<!-- TODO figure out how to update logback-core to fix vulnerabilites (1 Med, 1 Low) -->
+		<!-- TODO figure out how to update logback-core to fix vulnerabilites (1 Med, 1 Low)
+				  - dependency is from spring-boot-starter-parent; wait for update to this -->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
