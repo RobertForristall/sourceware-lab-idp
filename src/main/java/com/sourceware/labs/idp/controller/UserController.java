@@ -1,6 +1,8 @@
 package com.sourceware.labs.idp.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
@@ -92,21 +94,17 @@ public class UserController {
   private static final String VERIFY_PATH = "/verify/{userId}/{verificationToken}";
   private static final String LOGIN_PATH = "/login";
 
-  @Autowired
   private final UserRepo userRepo;
 
-  @Autowired
   private final RoleRepo roleRepo;
 
-  @Autowired
   private final AccountVerificationRepo accountVerificationRepo;
 
-  @Autowired
   private final AwsEmailService awsEmailService;
 
-  @Autowired
   private final AuthService authService;
 
+  @Autowired
   UserController(
           UserRepo userRepo,
           RoleRepo roleRepo,
@@ -234,6 +232,7 @@ public class UserController {
   String login(
           @RequestBody LoginData loginData,
           HttpServletResponse response) throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, OperatorCreationException, JOSEException {
+    
     Optional<RestError> error = loginData.isDataValid(LOGIN_PATH, RequestMethod.POST);
     if (error.isPresent()) {
       response.sendError(HttpStatus.BAD_REQUEST.value(), error.get().toString());
@@ -253,7 +252,7 @@ public class UserController {
         User user = users.get(0);
         SessionCookie cookie = authService
                 .generateSessionCookie(user, Application.RealQuick.name());
-        response.addCookie(new Cookie("SourcewareLabIdp", cookie.toString()));
+        response.addCookie(new Cookie("SourcewareLabIdp", URLEncoder.encode(cookie.toString(), StandardCharsets.UTF_8)));
         response.setStatus(HttpStatus.OK.value());
         return "Login Successful";
       }
