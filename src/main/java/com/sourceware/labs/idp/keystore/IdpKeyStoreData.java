@@ -1,5 +1,9 @@
 package com.sourceware.labs.idp.keystore;
 
+import java.util.Objects;
+
+import com.google.gson.Gson;
+
 /**
  * Class for holding all of the data needed to interact with the keystore
  *
@@ -53,5 +57,33 @@ public class IdpKeyStoreData {
   public String getKeyId() {
     return keyId;
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(keyAlias, keyId, keyPassword, storeDir, storeFileName, storePassword);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    IdpKeyStoreData other = (IdpKeyStoreData) obj;
+    return Objects.equals(keyAlias, other.keyAlias) && Objects.equals(keyId, other.keyId)
+            && Objects.equals(keyPassword, other.keyPassword)
+            && Objects.equals(storeDir, other.storeDir)
+            && Objects.equals(storeFileName, other.storeFileName)
+            && Objects.equals(storePassword, other.storePassword);
+  }
+
+  @Override
+  public String toString() {
+    return new Gson().toJson(this);
+  }
+  
+  
 
 }
