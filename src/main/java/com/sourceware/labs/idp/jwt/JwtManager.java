@@ -7,10 +7,12 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.bouncycastle.operator.OperatorCreationException;
 
+import com.google.gson.Gson;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -59,7 +61,11 @@ public class JwtManager {
           String clientId,
           String audience,
           long tokenExpiration,
-          IdpKeyStoreData keyStoreData) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, IOException, OperatorCreationException, JOSEException {
+          IdpKeyStoreData keyStoreData,
+          Long userId,
+          String applicationName,
+          String roleName,
+          List<String> additionalPermissions) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, IOException, OperatorCreationException, JOSEException {
     JWK key = IdpKeyStoreAccessor.accessKeyStore(securityAlg, keyStoreData);
     Date now = new Date();
     JWSHeader header = new JWSHeader.Builder((JWSAlgorithm) key.getAlgorithm())
@@ -70,10 +76,13 @@ public class JwtManager {
             .subject(clientId)
             .audience(audience)
             .claim("kid", key.getKeyID())
-            // Time between nbt and exp can not be greater than 5 minutes
             .notBeforeTime(Date.from(now.toInstant().minusSeconds(5)))
             .expirationTime(Date.from(now.toInstant().plusSeconds((tokenExpiration))))
             .jwtID(UUID.randomUUID().toString())
+            .claim("userId", userId)
+            .claim("application", applicationName)
+            .claim("roleName", roleName)
+            .claim("additionalPermissions", new Gson().toJson(additionalPermissions))
             .build();
     SignedJWT signedJWT = new SignedJWT(header, jwt);
     JWSSigner signer = securityAlg.equals(JWSAlgorithm.RS384)
@@ -112,6 +121,15 @@ public class JwtManager {
             ? new RSASSAVerifier(key.toRSAKey())
             : new ECDSAVerifier(key.toECKey());
     return signedJwt.verify(verifier);
+  }
+  
+  public static JWTClaimsSet getClaimsSetFromJwt(
+          String jwt,
+          JWSAlgorithm securityAlg,
+          IdpKeyStoreData keyStoreData) throws ParseException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, OperatorCreationException, IOException, JOSEException {
+    JWK key = IdpKeyStoreAccessor.accessKeyStore(securityAlg, keyStoreData);
+    SignedJWT signedJwt = SignedJWT.parse(jwt);
+    return signedJwt.getJWTClaimsSet();
   }
 
 }
