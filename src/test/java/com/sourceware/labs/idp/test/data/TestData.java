@@ -4,18 +4,20 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Set;
 
 import com.sourceware.labs.idp.entity.Role;
 import com.sourceware.labs.idp.entity.Role.Application;
 import com.sourceware.labs.idp.entity.Role.RoleName;
 import com.sourceware.labs.idp.entity.SecurityQuestion;
-import com.sourceware.labs.idp.entity.User;
+import com.sourceware.labs.idp.util.LoginData;
 import com.sourceware.labs.idp.util.SignupData;
 
 public class TestData {
 
   private static Timestamp ts = new Timestamp(new Date().getTime());
+  
+  private static String email = "test@test.com";
+  private static String password = "testPass";
 
   public static SecurityQuestion getTestSecurityQuestion() {
     SecurityQuestion sq = new SecurityQuestion();
@@ -39,8 +41,8 @@ public class TestData {
   public static SignupData getTestSignupData() {
     SecurityQuestion sq = getTestSecurityQuestion();
     SignupData user = new SignupData();
-    user.setEmail("test@test.com");
-    user.setPassword("testPass");
+    user.setEmail(email);
+    user.setPassword(password);
     user.setFirstName("Test");
     user.setLastName("User");
     try {
@@ -54,6 +56,13 @@ public class TestData {
     user.setSa1(sq.getAnswer1());
     user.setSa2(sq.getAnswer2());
     return user;
+  }
+  
+  public static LoginData getLoginData() {
+    LoginData login = new LoginData();
+    login.setEmail(email);
+    login.setPassword(password);
+    return login;
   }
 
 }
