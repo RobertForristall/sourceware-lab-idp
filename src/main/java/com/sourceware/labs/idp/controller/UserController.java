@@ -233,7 +233,7 @@ public class UserController {
           @RequestBody LoginData loginData,
           HttpServletResponse response) throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, OperatorCreationException, JOSEException {
     
-    Optional<RestError> error = loginData.isDataValid(LOGIN_PATH, RequestMethod.POST);
+    Optional<RestError> error = loginData.isDataValid(getRoutePath(LOGIN_PATH), RequestMethod.POST);
     if (error.isPresent()) {
       response.sendError(HttpStatus.BAD_REQUEST.value(), error.get().toString());
     } else {
@@ -242,9 +242,9 @@ public class UserController {
       if (users.size() != 1) {
         response.sendError(
                 HttpStatus.UNAUTHORIZED.value(),
-                new RestErrorBuilder().setRoute(LOGIN_PATH)
+                new RestErrorBuilder().setRoute(getRoutePath(LOGIN_PATH))
                         .setMethod(RequestMethod.POST)
-                        .setErrorCode(2)
+                        .setErrorCode(3)
                         .setMsg("Error: No user found using provided credentials")
                         .build()
                         .toString());

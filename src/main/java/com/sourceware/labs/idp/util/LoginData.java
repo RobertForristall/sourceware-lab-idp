@@ -45,9 +45,14 @@ public class LoginData {
     return EmailValidator.getInstance().isValid(email);
   }
   
+  private boolean isPasswordValid() {
+    return password != null && !password.isEmpty() && !password.isBlank();
+  }
+  
   public Optional<RestError> isDataValid(String route, RequestMethod method) {
     RestErrorBuilder errorBuilder = new RestErrorBuilder().setRoute(route).setMethod(method);
     if (!isEmailValid()) errorBuilder.setErrorCode(1).setMsg("Error: User's email is not valid");
+    if (!isPasswordValid()) errorBuilder.setErrorCode(2).setMsg("Error: Password must have a non-null and non-blank value");
     return errorBuilder.isErrorCodeSet() ? Optional.of(errorBuilder.build()) : Optional.empty();
   }
 
