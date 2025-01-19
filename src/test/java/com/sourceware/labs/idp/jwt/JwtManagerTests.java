@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.text.ParseException;
+import java.util.List;
 
 import org.bouncycastle.operator.OperatorCreationException;
 import org.junit.jupiter.api.AfterAll;
@@ -19,8 +20,10 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import com.google.gson.Gson;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.sourceware.labs.idp.keystore.IdpKeyStoreAccessor;
 import com.sourceware.labs.idp.keystore.IdpKeyStoreData;
@@ -69,10 +72,39 @@ public class JwtManagerTests {
             clientId,
             audience,
             tokenExpiration,
-            ecIdpKeyStoreData);
+            ecIdpKeyStoreData,
+            Long.valueOf(1),
+            "testApplication",
+            "testRole",
+            List.of("perm1", "perm2"));
     Assertions.assertNotNull(jwt.serialize());
     Assertions.assertTrue(
             JwtManager
                     .verifySignedJwtToken(jwt.serialize(), JWSAlgorithm.ES256, ecIdpKeyStoreData));
+  }
+  
+  @Test
+  @Order(2)
+  public void testClaimSetReturned() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, OperatorCreationException, IOException, JOSEException, ParseException {
+    SignedJWT jwt = JwtManager.getSignedJwtToken(
+            JWSAlgorithm.ES256,
+            clientId,
+            audience,
+            tokenExpiration,
+            ecIdpKeyStoreData,
+            Long.valueOf(1),
+            "testApplication",
+            "testRole",
+            List.of("perm1", "perm2"));
+    Assertions.assertNotNull(jwt.serialize());
+    validateJwtClaimSet(jwt.serialize());
+  }
+  
+  public void validateJwtClaimSet(String jwt) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, OperatorCreationException, ParseException, IOException, JOSEException {
+    JWTClaimsSet claimSet = JwtManager.getClaimsSetFromJwt(jwt, JWSAlgorithm.ES256, ecIdpKeyStoreData);
+    Assertions.assertEquals(Long.valueOf(1), claimSet.getLongClaim("userId"));
+    Assertions.assertEquals("testApplication", claimSet.getStringClaim("application"));
+    Assertions.assertEquals("testRole", claimSet.getStringClaim("roleName"));
+    Assertions.assertIterableEquals(List.of("perm1", "perm2"), List.of(new Gson().fromJson(claimSet.getStringClaim("additionalPermissions"), String[].class)));
   }
 }

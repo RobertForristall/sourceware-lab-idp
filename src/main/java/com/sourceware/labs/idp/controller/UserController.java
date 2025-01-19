@@ -1,12 +1,19 @@
 package com.sourceware.labs.idp.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.bouncycastle.operator.OperatorCreationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.nimbusds.jose.JOSEException;
 import com.sourceware.labs.idp.entity.AccountVerification;
 import com.sourceware.labs.idp.entity.Role.Application;
 import com.sourceware.labs.idp.entity.Role.RoleName;
@@ -34,8 +42,10 @@ import com.sourceware.labs.idp.repo.RoleRepo;
 import com.sourceware.labs.idp.repo.UserRepo;
 import com.sourceware.labs.idp.service.AuthService;
 import com.sourceware.labs.idp.service.AwsEmailService;
+import com.sourceware.labs.idp.util.LoginData;
 import com.sourceware.labs.idp.util.RestError;
 import com.sourceware.labs.idp.util.RestError.RestErrorBuilder;
+import com.sourceware.labs.idp.util.SessionCookie;
 import com.sourceware.labs.idp.util.SignupData;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +55,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
@@ -81,22 +92,19 @@ public class UserController {
   private static final String BASE_PATH = "/user";
   private static final String SIGNUP_PATH = "/signup";
   private static final String VERIFY_PATH = "/verify/{userId}/{verificationToken}";
+  private static final String LOGIN_PATH = "/login";
 
-  @Autowired
   private final UserRepo userRepo;
 
-  @Autowired
   private final RoleRepo roleRepo;
 
-  @Autowired
   private final AccountVerificationRepo accountVerificationRepo;
 
-  @Autowired
   private final AwsEmailService awsEmailService;
 
-  @Autowired
   private final AuthService authService;
 
+  @Autowired
   UserController(
           UserRepo userRepo,
           RoleRepo roleRepo,
@@ -210,6 +218,44 @@ public class UserController {
               .build();
       LOGGER.error(restError.toString());
       response.sendError(HttpStatus.BAD_REQUEST.value(), restError.toString());
+    }
+    return null;
+  }
+
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "User is successfully logged in", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
+    @ApiResponse(responseCode = "401", description = "User login credentials failed", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))}),
+    @ApiResponse(responseCode = "400", description = "User failed to login", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestError.class))})
+  })
+  @Tag(name = "post", description = "POST methods for User APIs")
+  @PostMapping(LOGIN_PATH)
+  String login(
+          @RequestBody LoginData loginData,
+          HttpServletResponse response) throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, OperatorCreationException, JOSEException {
+    
+    Optional<RestError> error = loginData.isDataValid(getRoutePath(LOGIN_PATH), RequestMethod.POST);
+    if (error.isPresent()) {
+      response.sendError(HttpStatus.BAD_REQUEST.value(), error.get().toString());
+    } else {
+      List<User> users = userRepo
+              .findUserByEmailAndPassword(loginData.getEmail(), loginData.getPassword());
+      if (users.size() != 1) {
+        response.sendError(
+                HttpStatus.UNAUTHORIZED.value(),
+                new RestErrorBuilder().setRoute(getRoutePath(LOGIN_PATH))
+                        .setMethod(RequestMethod.POST)
+                        .setErrorCode(3)
+                        .setMsg("Error: No user found using provided credentials")
+                        .build()
+                        .toString());
+      } else {
+        User user = users.get(0);
+        SessionCookie cookie = authService
+                .generateSessionCookie(user, Application.RealQuick.name());
+        response.addCookie(new Cookie("SourcewareLabIdp", URLEncoder.encode(cookie.toString(), StandardCharsets.UTF_8)));
+        response.setStatus(HttpStatus.OK.value());
+        return "Login Successful";
+      }
     }
     return null;
   }
