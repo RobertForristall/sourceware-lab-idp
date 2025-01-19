@@ -47,6 +47,7 @@ public class LoginTests extends BaseIdpApplicationTests{
   private String testingPath;
   private RequestMethod testingMethod;
   private URI fullTestingRoute;
+  private Long userId;
   
   private final String storeDir = "testKeyStoreDir";
   private final String storeName = "testKeyStoreName";
@@ -75,7 +76,7 @@ public class LoginTests extends BaseIdpApplicationTests{
     Assertions.assertEquals(HttpStatusCode.valueOf(201), signupResult.getStatusCode());
     Assertions.assertEquals("User Created Successfully", signupResult.getBody());
     String verificationToken = signupData.getVerificationToken();
-    Long userId = Long.valueOf(userRepo.findAll().get(0).getId());
+    userId = Long.valueOf(userRepo.findAll().get(0).getId());
     ResponseEntity<String> verificationResult = this.restTemplate.getForEntity(baseUrl + "/user/verify" + getVerificationPathVariables(String.valueOf(userId.intValue()), verificationToken), String.class);
     Assertions.assertEquals(HttpStatusCode.valueOf(200), verificationResult.getStatusCode());
     Assertions.assertEquals("User successfully verified", verificationResult.getBody());
@@ -193,7 +194,7 @@ public class LoginTests extends BaseIdpApplicationTests{
     String cookieId = decodedCookie.split("=")[0];
     SessionCookie sessionCookie = new Gson().fromJson(decodedCookie.split("=")[1], SessionCookie.class);
     Assertions.assertEquals("SourcewareLabIdp", cookieId);
-    Assertions.assertEquals(1, sessionCookie.getUserId());
+    Assertions.assertEquals(userId, sessionCookie.getUserId());
     Assertions.assertEquals("RealQuick", sessionCookie.getApplication());
     Assertions.assertEquals("User", sessionCookie.getRole());
     Assertions.assertIterableEquals(List.of(), sessionCookie.getAdditionalPermissions());
@@ -204,7 +205,7 @@ public class LoginTests extends BaseIdpApplicationTests{
   
   public void validateJwtClaimSet(String jwt) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, OperatorCreationException, ParseException, IOException, JOSEException {
     JWTClaimsSet claimSet = JwtManager.getClaimsSetFromJwt(jwt, JWSAlgorithm.ES256, ecIdpKeyStoreData);
-    Assertions.assertEquals(Long.valueOf(1), claimSet.getLongClaim("userId"));
+    Assertions.assertEquals(userId, claimSet.getLongClaim("userId"));
     Assertions.assertEquals("RealQuick", claimSet.getStringClaim("application"));
     Assertions.assertEquals("User", claimSet.getStringClaim("roleName"));
     Assertions.assertIterableEquals(List.of(), List.of(new Gson().fromJson(claimSet.getStringClaim("additionalPermissions"), String[].class)));
