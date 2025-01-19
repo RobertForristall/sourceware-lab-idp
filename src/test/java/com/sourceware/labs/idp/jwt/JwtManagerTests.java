@@ -97,7 +97,11 @@ public class JwtManagerTests {
             "testRole",
             List.of("perm1", "perm2"));
     Assertions.assertNotNull(jwt.serialize());
-    JWTClaimsSet claimSet = JwtManager.getClaimsSetFromJwt(jwt.serialize(), JWSAlgorithm.ES256, ecIdpKeyStoreData);
+    validateJwtClaimSet(jwt.serialize());
+  }
+  
+  public void validateJwtClaimSet(String jwt) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException, OperatorCreationException, ParseException, IOException, JOSEException {
+    JWTClaimsSet claimSet = JwtManager.getClaimsSetFromJwt(jwt, JWSAlgorithm.ES256, ecIdpKeyStoreData);
     Assertions.assertEquals(Long.valueOf(1), claimSet.getLongClaim("userId"));
     Assertions.assertEquals("testApplication", claimSet.getStringClaim("application"));
     Assertions.assertEquals("testRole", claimSet.getStringClaim("roleName"));
